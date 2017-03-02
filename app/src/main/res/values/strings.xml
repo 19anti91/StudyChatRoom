@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Study Chat Room</string>
+
+    <string-array name="usertype">
+        <item>Student</item>
+        <item>Teacher</item>
+        <item>Administrator</item>
+    </string-array>
 </resources>
