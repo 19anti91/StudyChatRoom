@@ -6,11 +6,12 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 
@@ -39,8 +40,14 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         String usertype = "";
         String response = "";
 
+
+        URL url = null;
+        OutputStream outputPost = null;
+        BufferedReader in = null;
+        HttpURLConnection client = null;
+
         try {
-            String link = "http://passtrunk.com/OOPAPI/test.php";
+            String link = "http://www.passtrunk.com/OOPAPI/test.php";
 
             if (args[0] == "login") {
                 action = args[0];
@@ -70,15 +77,47 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(usertype, "UTF-8");
             }
 
-            URL url = new URL(link);
-            URLConnection conn = url.openConnection();
+            url = new URL(link);
+
+            client = (HttpURLConnection) url.openConnection();
+            client.setRequestMethod("POST");
+            //client.setRequestProperty("action",action);
+
+            //client.setRequestProperty("username", username);
+            // client.setRequestProperty("password",password);
+            client.setDoOutput(true);
+
+            outputPost = new BufferedOutputStream(client.getOutputStream());
+            outputPost.write(data.getBytes());
+            outputPost.flush();
+            //outputPost.close();
+            int status = client.getResponseCode();
+            Log.e("response code", String.valueOf(status));
+
+            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+            status = client.getResponseCode();
+            Log.e("response code", String.valueOf(status));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+
+            //Read response
+            while ((line = in.readLine()) != null) {
+                sb.append(line);
+            }
+
+            response = sb.toString();
+            Log.d("Result", response);
+            in.close();
+            outputPost.close();
+            /*URLConnection conn = url.openConnection();
 
             conn.setDoOutput(true);
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
 
             wr.write(data);
             wr.flush();
-
+*//*
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
             StringBuilder sb = new StringBuilder();
@@ -90,9 +129,10 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             }
 
             response = sb.toString();
-            Log.d("Result", response);
+            Log.d("Result", response);*/
         } catch (Exception e) {
-            Log.e("Error on SubmitLogin", e.toString());
+            //Log.e("Error on SubmitLogin", );
+            e.printStackTrace();
         }
         return response;
     }
