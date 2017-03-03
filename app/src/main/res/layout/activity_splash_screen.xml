@@ -8,6 +8,29 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.oop.projectgroup10.studychatroom.SplashScreen">
+    tools:context="com.oop.projectgroup10.studychatroom.SplashScreen"
+    android:background="@color/colorBackgroundDarker">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/name"
+        android:text="Study Chat Room"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textAllCaps="true"
+        android:textSize="30sp"
+        android:fontFamily="casual"
+        android:textStyle="normal|bold"
+        android:textColor="@color/colorPrimaryDark" />
+
+    <ProgressBar
+        style="@android:style/Widget.Holo.ProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:id="@+id/progressBar"
+        android:layout_below="@+id/name"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
