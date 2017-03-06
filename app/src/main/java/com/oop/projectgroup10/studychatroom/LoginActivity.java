@@ -16,7 +16,8 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
     }
 
-
+    //TODO check internet connection
+    //TODO validate input(there is something on the field before submititng the login)
     public void register(View v) {
         Intent goToRegister = new Intent(v.getContext(), RegisterActivity.class);
         v.getContext().startActivity(goToRegister);

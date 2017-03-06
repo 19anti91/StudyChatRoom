@@ -5,6 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    //TODO sending the data to the server
+    //TODO Data validation
+    //TODO password validation
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

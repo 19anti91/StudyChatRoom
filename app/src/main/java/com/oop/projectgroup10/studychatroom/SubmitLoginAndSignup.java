@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 
 /**
@@ -48,15 +49,25 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
         try {
             String link = "http://www.passtrunk.com/OOPAPI/test.php";
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+
 
             if (args[0] == "login") {
                 action = args[0];
                 username = args[1];
                 password = args[2];
 
+                md.update(password.getBytes());
+                byte byteData[] = md.digest();
+
+                StringBuffer encPass = new StringBuffer();
+                for (int i = 0; i < byteData.length; i++) {
+                    encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+                }
+
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
-                data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
+                data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(encPass.toString(), "UTF-8");
             } else if (args[0] == "register") {
                 action = args[0];
                 fname = args[1];
@@ -66,10 +77,17 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 password = args[5];
                 usertype = args[6];
                 hashkey = new SimpleDateFormat("YYYY-MM-DD'T'HH:mm:ss'Z'").toString();
+                md.update(password.getBytes());
+                byte byteData[] = md.digest();
+
+                StringBuffer encPass = new StringBuffer();
+                for (int i = 0; i < byteData.length; i++) {
+                    encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+                }
 
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
-                data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(password, "UTF-8");
+                data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(encPass.toString(), "UTF-8");
                 data += "&" + URLEncoder.encode("fname", "UTF-8") + "=" + URLEncoder.encode(fname, "UTF-8");
                 data += "&" + URLEncoder.encode("lname", "UTF-8") + "=" + URLEncoder.encode(lname, "UTF-8");
                 data += "&" + URLEncoder.encode("emailAddress", "UTF-8") + "=" + URLEncoder.encode(emailaddress, "UTF-8");
@@ -81,16 +99,12 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
             client = (HttpURLConnection) url.openConnection();
             client.setRequestMethod("POST");
-            //client.setRequestProperty("action",action);
 
-            //client.setRequestProperty("username", username);
-            // client.setRequestProperty("password",password);
-            client.setDoOutput(true);
 
             outputPost = new BufferedOutputStream(client.getOutputStream());
             outputPost.write(data.getBytes());
             outputPost.flush();
-            //outputPost.close();
+
             int status = client.getResponseCode();
             Log.e("response code", String.valueOf(status));
 
@@ -110,26 +124,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             Log.d("Result", response);
             in.close();
             outputPost.close();
-            /*URLConnection conn = url.openConnection();
 
-            conn.setDoOutput(true);
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-
-            wr.write(data);
-            wr.flush();
-*//*
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-
-            //Read response
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-
-            response = sb.toString();
-            Log.d("Result", response);*/
         } catch (Exception e) {
             //Log.e("Error on SubmitLogin", );
             e.printStackTrace();
@@ -149,6 +144,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             statusMessage = returnValues.getString("statusMessage");
             data = returnValues.getJSONObject("data");
 
+            //TODO check for status and do toast with info accordingly
             Log.d("status", status);
             Log.d("statusMessage", statusMessage);
             Log.d("data", data.toString());
@@ -156,4 +152,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             Log.d("Error onPostexecute", e.toString());
         }
     }
+
+
 }
+
