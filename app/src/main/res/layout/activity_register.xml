@@ -42,11 +42,11 @@
         android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:ems="10"
-        android:layout_below="@+id/registerT"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="25dp"
         android:id="@+id/fname"
-        android:hint="First Name" />
+        android:hint="First Name"
+        android:layout_below="@+id/registerT"
+        android:layout_centerHorizontal="true" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -55,7 +55,7 @@
         android:ems="10"
         android:layout_below="@+id/fname"
         android:layout_alignEnd="@+id/fname"
-        android:id="@+id/editText2"
+        android:id="@+id/lname"
         android:hint="Last Name" />
 
     <EditText
@@ -75,8 +75,8 @@
         android:ems="10"
         android:id="@+id/usernameR"
         android:hint="Username"
-        android:layout_below="@+id/editText2"
-        android:layout_alignStart="@+id/editText2" />
+        android:layout_below="@+id/lname"
+        android:layout_alignStart="@+id/lname" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -103,10 +103,9 @@
         android:layout_height="wrap_content"
         android:entries="@array/usertype"
         android:id="@+id/usertype"
-        android:layout_marginTop="12dp"
-        android:layout_below="@+id/confirmpassword"
-        android:layout_toEndOf="@+id/usertypeT"
-        android:layout_marginStart="9dp" />
+        android:layout_marginEnd="9dp"
+        android:layout_alignBottom="@+id/usertypeT"
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:text="User Type"
@@ -114,16 +113,26 @@
         android:layout_height="wrap_content"
         android:id="@+id/usertypeT"
         android:textSize="18sp"
-        android:layout_alignBottom="@+id/usertype"
+        android:layout_below="@+id/passMatch"
         android:layout_alignStart="@+id/confirmpassword" />
 
     <Button
-        android:text="Submit"
+        android:id="@+id/submitRegisterBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/submitRegisterBtn"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="25dp"
         android:background="@color/colorPrimaryDark"
-        android:layout_marginTop="26dp"
-        android:layout_below="@+id/usertype"
-        android:layout_centerHorizontal="true" />
+        android:onClick="submitRegistration"
+        android:text="Submit" />
+
+    <TextView
+        android:id="@+id/passMatch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/confirmpassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="13dp"
+        android:textSize="14sp" />
 </RelativeLayout>

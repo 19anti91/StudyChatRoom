@@ -1,8 +1,11 @@
 package com.oop.projectgroup10.studychatroom;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -23,9 +26,11 @@ import java.text.SimpleDateFormat;
 public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
     private Context context;
+    private Activity act;
 
-    public SubmitLoginAndSignup(Context context) {
+    public SubmitLoginAndSignup(Context context, Activity act) {
         this.context = context;
+        this.act = act;
     }
 
     protected String doInBackground(String... args) {
@@ -47,43 +52,40 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         BufferedReader in = null;
         HttpURLConnection client = null;
 
+        MessageDigest md;
+
         try {
             String link = "http://www.passtrunk.com/OOPAPI/test.php";
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md = MessageDigest.getInstance("SHA-256");
+            password = args[2];
+            Log.d("P", password);
+            md.update(password.getBytes());
+            byte byteData[] = md.digest();
 
-
+            StringBuilder encPass = new StringBuilder();
+            for (int i = 0; i < byteData.length; i++) {
+                encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+            }
             if (args[0] == "login") {
                 action = args[0];
                 username = args[1];
-                password = args[2];
 
-                md.update(password.getBytes());
-                byte byteData[] = md.digest();
 
-                StringBuffer encPass = new StringBuffer();
-                for (int i = 0; i < byteData.length; i++) {
-                    encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-                }
-
+                Log.d("PASSSSSS", encPass.toString());
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
                 data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(encPass.toString(), "UTF-8");
+                Log.e("Link", data);
             } else if (args[0] == "register") {
                 action = args[0];
-                fname = args[1];
-                lname = args[2];
-                username = args[3];
-                emailaddress = args[4];
-                password = args[5];
+                username = args[1];
+                fname = args[3];
+                lname = args[4];
+                emailaddress = args[5];
                 usertype = args[6];
-                hashkey = new SimpleDateFormat("YYYY-MM-DD'T'HH:mm:ss'Z'").toString();
-                md.update(password.getBytes());
-                byte byteData[] = md.digest();
+                hashkey = new SimpleDateFormat().toString();
 
-                StringBuffer encPass = new StringBuffer();
-                for (int i = 0; i < byteData.length; i++) {
-                    encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-                }
+
 
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
@@ -93,6 +95,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("emailAddress", "UTF-8") + "=" + URLEncoder.encode(emailaddress, "UTF-8");
                 data += "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(hashkey, "UTF-8");
                 data += "&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(usertype, "UTF-8");
+                Log.e("Link", data);
             }
 
             url = new URL(link);
@@ -105,13 +108,10 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             outputPost.write(data.getBytes());
             outputPost.flush();
 
-            int status = client.getResponseCode();
-            Log.e("response code", String.valueOf(status));
 
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-            status = client.getResponseCode();
-            Log.e("response code", String.valueOf(status));
+
             StringBuilder sb = new StringBuilder();
             String line = null;
 
@@ -126,27 +126,73 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             outputPost.close();
 
         } catch (Exception e) {
-            //Log.e("Error on SubmitLogin", );
+
             e.printStackTrace();
         }
         return response;
     }
 
+
     protected void onPostExecute(String response) {
         JSONObject returnValues;
 
-        String status = "";
-        String statusMessage = "";
+        int status;
+        String statusMessage;
+        String action;
         JSONObject data;
         try {
             returnValues = new JSONObject(response);
-            status = returnValues.getString("status");
+            status = Integer.valueOf(returnValues.getString("status"));
             statusMessage = returnValues.getString("statusMessage");
             data = returnValues.getJSONObject("data");
+            action = data.getString("action");
+            Log.d("RESPONDE", returnValues.toString());
 
-            //TODO check for status and do toast with info accordingly
-            Log.d("status", status);
-            Log.d("statusMessage", statusMessage);
+            if (action.equals("login")) {
+                SharedPreferences pref = this.context.getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+                SharedPreferences.Editor editor = pref.edit();
+                //int userID = Integer.valueOf(data.getString("userid"));
+
+                //user logged in fine lets save the info on the shared preferences
+                //status = 0 means no errors
+                //status = 1 means wrong password
+                //status = 2 means user not found
+                //status = 3 means username taken(on register page)
+                //status = 4 means email taken (on register page)
+                //status = 5 means wrong email address
+                if (status == 0) {
+                    int userID = Integer.valueOf(data.getString("userid"));
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                    editor.putInt("userid", userID);
+                    editor.putString("fname", data.getString("fname"));
+                    editor.putString("lname", data.getString("lname"));
+                    editor.putString("emailaddress", data.getString("emailaddress"));
+                    editor.putString("username", data.getString("username"));
+                    editor.putString("type", data.getString("type"));
+                    editor.commit();
+                    //TODO GO TO NEXT ACTIVITY
+                } else if (status == 1 || status == 2) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                }
+                //Inform the user the login as been sucessfull and store data on the pref settings
+            } else if (action.equals("register")) {
+
+                if (status == 0) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                    act.finish();
+                } else if (status == 3) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                } else if (status == 4) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                } else if (status == 5) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                }
+
+                //get data back and make sure the registration was successfully
+
+            }
+
+
             Log.d("data", data.toString());
         } catch (Exception e) {
             Log.d("Error onPostexecute", e.toString());
