@@ -6,6 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -52,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         if (getUsername().isEmpty() || getPassword().isEmpty()) {
             Toast.makeText(this, "Please enter a valid username and password", Toast.LENGTH_LONG).show();
         } else {
-
+            Log.d("Pass on activity", getPassword());
             new SubmitLoginAndSignup(v.getContext(), this).execute("login", getUsername(), getPassword());
         }
 

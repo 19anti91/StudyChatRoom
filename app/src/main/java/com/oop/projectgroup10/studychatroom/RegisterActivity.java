@@ -55,14 +55,14 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void submitRegistration(View v) {
 
-        if (getFname().isEmpty() || getLname().isEmpty() || getUsername().isEmpty() || getEmail().isEmpty() || getUserType().isEmpty() || passwordOK) {
+        if (getFname().isEmpty() || getLname().isEmpty() || getUsername().isEmpty() || getEmail().isEmpty() || getUserType().isEmpty() || !passwordOK) {
             Toast.makeText(this, "Please note that all the fields are required. Passwords must match", Toast.LENGTH_LONG).show();
         } else {
-            new SubmitLoginAndSignup(v.getContext(), this).execute("register", getFname(), getLname(), getUsername(), getEmail(), getPassword(), getUserType());
+            new SubmitLoginAndSignup(v.getContext(), this).execute("register", getUsername(), getPassword(), getFname(), getLname(), getEmail(), getUserType());
         }
 
     }
-
+//TODO REGEX to check email
 
     //getters
     public String getFname() {

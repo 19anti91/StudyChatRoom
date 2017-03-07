@@ -52,55 +52,40 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         BufferedReader in = null;
         HttpURLConnection client = null;
 
+        MessageDigest md;
+
         try {
             String link = "http://www.passtrunk.com/OOPAPI/test.php";
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md = MessageDigest.getInstance("SHA-256");
+            password = args[2];
+            Log.d("P", password);
+            md.update(password.getBytes());
+            byte byteData[] = md.digest();
 
-
+            StringBuilder encPass = new StringBuilder();
+            for (int i = 0; i < byteData.length; i++) {
+                encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+            }
             if (args[0] == "login") {
                 action = args[0];
                 username = args[1];
-                password = args[2];
 
 
-                md.update(password.getBytes());
-                byte byteData[] = md.digest();
-
-                StringBuffer encPass = new StringBuffer();
-                for (int i = 0; i < byteData.length; i++) {
-                    encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-                }
-
+                Log.d("PASSSSSS", encPass.toString());
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
                 data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(encPass.toString(), "UTF-8");
+                Log.e("Link", data);
             } else if (args[0] == "register") {
                 action = args[0];
-                fname = args[1];
-                lname = args[2];
-                username = args[3];
-                emailaddress = args[4];
-                password = args[5];
+                username = args[1];
+                fname = args[3];
+                lname = args[4];
+                emailaddress = args[5];
                 usertype = args[6];
-                hashkey = new SimpleDateFormat("YYYY-MM-DD'T'HH:mm:ss'Z'").toString();
+                hashkey = new SimpleDateFormat().toString();
 
-                if (username.equals("") || password.equals("") || fname.equals("") || lname.equals("") || emailaddress.equals("") || password.equals("")) {
 
-                    act.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(act, "Please fill all the fields", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                }
-                md.update(password.getBytes());
-                byte byteData[] = md.digest();
-
-                StringBuffer encPass = new StringBuffer();
-                for (int i = 0; i < byteData.length; i++) {
-                    encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-                }
 
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
@@ -110,6 +95,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("emailAddress", "UTF-8") + "=" + URLEncoder.encode(emailaddress, "UTF-8");
                 data += "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(hashkey, "UTF-8");
                 data += "&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(usertype, "UTF-8");
+                Log.e("Link", data);
             }
 
             url = new URL(link);
@@ -160,7 +146,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             statusMessage = returnValues.getString("statusMessage");
             data = returnValues.getJSONObject("data");
             action = data.getString("action");
-
+            Log.d("RESPONDE", returnValues.toString());
 
             if (action.equals("login")) {
                 SharedPreferences pref = this.context.getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
@@ -170,7 +156,10 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 //user logged in fine lets save the info on the shared preferences
                 //status = 0 means no errors
                 //status = 1 means wrong password
-                //status = 3 means user not found
+                //status = 2 means user not found
+                //status = 3 means username taken(on register page)
+                //status = 4 means email taken (on register page)
+                //status = 5 means wrong email address
                 if (status == 0) {
                     int userID = Integer.valueOf(data.getString("userid"));
                     Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
@@ -181,15 +170,28 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                     editor.putString("username", data.getString("username"));
                     editor.putString("type", data.getString("type"));
                     editor.commit();
-                } else if (status == 1 || status == 3) {
+                    //TODO GO TO NEXT ACTIVITY
+                } else if (status == 1 || status == 2) {
                     Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
                 }
                 //Inform the user the login as been sucessfull and store data on the pref settings
             } else if (action.equals("register")) {
+
+                if (status == 0) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                    act.finish();
+                } else if (status == 3) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                } else if (status == 4) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                } else if (status == 5) {
+                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                }
+
                 //get data back and make sure the registration was successfully
+
             }
-            //TODO Preferences cookies
-            //TODO check for status and do toast with info accordingly
+
 
             Log.d("data", data.toString());
         } catch (Exception e) {
