@@ -1,5 +1,6 @@
 package com.oop.projectgroup10.studychatroom;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -41,7 +42,8 @@ public class DashBoard extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            moveTaskToBack(true);
+            System.exit(0);
         }
     }
 
@@ -89,13 +91,26 @@ public class DashBoard extends AppCompatActivity
         if (id == R.id.createRoom) {
 
         } else if (id == R.id.settings) {
-
+            Intent goToSettings = new Intent(this, SettingsActivity.class);
+            startActivity(goToSettings);
         } else if (id == R.id.logout) {
-
+            clearPref();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    //Clear preferences. Can be used to log out
+    public void clearPref() {
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+        SharedPreferences.Editor edit = pref.edit();
+        edit.clear();
+        edit.commit();
+        this.finish();
+    }
+
+
 }
+

@@ -57,7 +57,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         MessageDigest md;
 
         try {
-            String link = "http://www.passtrunk.com/OOPAPI/test.php";
+            String link = "http://www.passtrunk.com/OOPAPI/regandsign.php";
             md = MessageDigest.getInstance("SHA-256");
             password = args[2];
 
