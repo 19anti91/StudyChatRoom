@@ -2,14 +2,15 @@ package com.oop.projectgroup10.studychatroom;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -24,7 +25,8 @@ public class LoginActivity extends AppCompatActivity {
 
         Button loginBtn = (Button) findViewById(R.id.loginBtn);
         Button registerBtn = (Button) findViewById(R.id.registerBtn);
-
+        SharedPreferences pref = getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+        int rememberMe = pref.getInt("rememberme", 0);
         if (!hasInternetAccess()) {
             Toast.makeText(LoginActivity.this, "You have no internet Connection at the moment. Please try again later", Toast.LENGTH_LONG).show();
 
@@ -32,9 +34,17 @@ public class LoginActivity extends AppCompatActivity {
             registerBtn.setEnabled(false);
         } else {
 
+            if (rememberMe == 1) {
+                Intent goToDash = new Intent(this, DashBoard.class);
+                this.startActivity(goToDash);
+            }
             loginBtn.setEnabled(true);
             registerBtn.setEnabled(true);
+
+
         }
+
+
     }
 
     public void onBackPressed() {
@@ -49,12 +59,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void submitLogin(View v) {
+        CheckBox rememberMe = (CheckBox) findViewById(R.id.rememberMeL);
 
         if (getUsername().isEmpty() || getPassword().isEmpty()) {
             Toast.makeText(this, "Please enter a valid username and password", Toast.LENGTH_LONG).show();
         } else {
-            Log.d("Pass on activity", getPassword());
-            new SubmitLoginAndSignup(v.getContext(), this).execute("login", getUsername(), getPassword());
+
+            new SubmitLoginAndSignup(v.getContext(), this).execute("login", getUsername(), getPassword(), String.valueOf(rememberMe.isChecked()));
         }
 
     }

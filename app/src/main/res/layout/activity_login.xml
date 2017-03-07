@@ -81,4 +81,13 @@
         android:layout_alignStart="@+id/passwordL"
         android:onClick="submitLogin" />
 
+    <CheckBox
+        android:id="@+id/rememberMeL"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/passwordL"
+        android:layout_below="@+id/passwordL"
+        android:layout_marginTop="25dp"
+        android:text="Remember me" />
+
 </RelativeLayout>

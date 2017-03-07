@@ -2,6 +2,7 @@ package com.oop.projectgroup10.studychatroom;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -33,24 +34,25 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         this.act = act;
     }
 
+    String rememberMe;
     protected String doInBackground(String... args) {
 
-        String action = "";
-        String fname = "";
-        String lname = "";
-        String username = "";
-        String password = "";
-        String emailaddress = "";
-        String hashkey = "";
+        String action;
+        String fname;
+        String lname;
+        String username;
+        String password;
+        String emailaddress;
+        String hashkey;
         String data = "";
-        String usertype = "";
+        String usertype;
         String response = "";
 
 
-        URL url = null;
-        OutputStream outputPost = null;
-        BufferedReader in = null;
-        HttpURLConnection client = null;
+        URL url;
+        OutputStream outputPost;
+        BufferedReader in;
+        HttpURLConnection client;
 
         MessageDigest md;
 
@@ -58,7 +60,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             String link = "http://www.passtrunk.com/OOPAPI/test.php";
             md = MessageDigest.getInstance("SHA-256");
             password = args[2];
-            Log.d("P", password);
+
             md.update(password.getBytes());
             byte byteData[] = md.digest();
 
@@ -69,9 +71,9 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             if (args[0] == "login") {
                 action = args[0];
                 username = args[1];
+                rememberMe = args[3];
 
 
-                Log.d("PASSSSSS", encPass.toString());
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
                 data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(encPass.toString(), "UTF-8");
@@ -146,7 +148,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
             statusMessage = returnValues.getString("statusMessage");
             data = returnValues.getJSONObject("data");
             action = data.getString("action");
-            Log.d("RESPONDE", returnValues.toString());
+
 
             if (action.equals("login")) {
                 SharedPreferences pref = this.context.getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
@@ -169,12 +171,16 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                     editor.putString("emailaddress", data.getString("emailaddress"));
                     editor.putString("username", data.getString("username"));
                     editor.putString("type", data.getString("type"));
+                    if (rememberMe.equals("true")) {
+                        editor.putInt("rememberme", 1);
+                    }
                     editor.commit();
-                    //TODO GO TO NEXT ACTIVITY
+                    Intent goToDash = new Intent(context, DashBoard.class);
+                    context.startActivity(goToDash);
                 } else if (status == 1 || status == 2) {
                     Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
                 }
-                //Inform the user the login as been sucessfull and store data on the pref settings
+                //Inform the user the login as been sucessful and store data on the pref settings
             } else if (action.equals("register")) {
 
                 if (status == 0) {
@@ -188,7 +194,6 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                     Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
                 }
 
-                //get data back and make sure the registration was successfully
 
             }
 
