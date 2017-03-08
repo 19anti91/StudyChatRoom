@@ -11,8 +11,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".SplashScreen">
+        android:theme="@style/studyChat">
+        <activity
+            android:name=".SplashScreen"
+            android:theme="@style/studyChat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,28 +24,23 @@
         <activity
             android:name=".LoginActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/studyChat" />
         <activity
             android:name=".RegisterActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/studyChat" />
         <activity
             android:name=".DashBoard"
+            android:configChanges="orientation"
             android:label="@string/title_activity_dash_board"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait" />
 
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".DashBoard"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
-        </activity>
+            android:name=".MemberSettings"
+            android:screenOrientation="portrait"
+            android:theme="@style/studyChat" />
 
         <service android:name=".Firebase">
             <intent-filter>

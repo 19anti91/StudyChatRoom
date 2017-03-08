@@ -74,8 +74,11 @@ public class DashBoard extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+
         if (id == R.id.action_settings) {
-            return true;
+            Intent goToSettings = new Intent(this, MemberSettings.class);
+            startActivity(goToSettings);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -91,7 +94,7 @@ public class DashBoard extends AppCompatActivity
         if (id == R.id.createRoom) {
 
         } else if (id == R.id.settings) {
-            Intent goToSettings = new Intent(this, SettingsActivity.class);
+            Intent goToSettings = new Intent(this, MemberSettings.class);
             startActivity(goToSettings);
         } else if (id == R.id.logout) {
             clearPref();

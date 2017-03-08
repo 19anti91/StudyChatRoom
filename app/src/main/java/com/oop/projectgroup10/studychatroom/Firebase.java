@@ -25,7 +25,7 @@ public class Firebase extends FirebaseInstanceIdService {
         // manage this apps subscriptions on the server side, send the
         // Instance ID token to your app server.
 
-        SharedPreferences pref = this.getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+        SharedPreferences pref = getBaseContext().getSharedPreferences("StudyChatRoom", 0);
         SharedPreferences.Editor edit = pref.edit();
         edit.putString("firebasetoken", refreshedToken);
 

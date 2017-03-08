@@ -8,6 +8,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.iid.InstanceID;
+
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
@@ -77,7 +79,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("username", "UTF-8") + "=" + URLEncoder.encode(username, "UTF-8");
                 data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + URLEncoder.encode(encPass.toString(), "UTF-8");
-                Log.e("Link", data);
+
             } else if (args[0] == "register") {
                 action = args[0];
                 username = args[1];
@@ -151,9 +153,9 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
 
             if (action.equals("login")) {
-                SharedPreferences pref = this.context.getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+                final SharedPreferences pref = this.context.getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
                 SharedPreferences.Editor editor = pref.edit();
-                //int userID = Integer.valueOf(data.getString("userid"));
+                final String uID = data.getString("userid");
 
                 //user logged in fine lets save the info on the shared preferences
                 //status = 0 means no errors
@@ -171,16 +173,46 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                     editor.putString("emailaddress", data.getString("emailaddress"));
                     editor.putString("username", data.getString("username"));
                     editor.putString("type", data.getString("type"));
+                    editor.putString("notifsettings", data.getString("notifsettings"));
                     if (rememberMe.equals("true")) {
                         editor.putInt("rememberme", 1);
                     }
-                    editor.commit();
+                    editor.apply();
+
+                    //Force ID refresh on sign in
+                    try {
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                String fbinstance = InstanceID.getInstance(context).getId();
+
+                                String authorizeEnt = "338611432116";
+                                String scope = "GCM";
+                                try {
+                                    InstanceID.getInstance(context).deleteInstanceID();
+                                    String newIID = InstanceID.getInstance(context).getId();
+                                    String token = InstanceID.getInstance(context).getToken(authorizeEnt, scope);
+
+                                    new SendDataAsync(context, act).execute("updateFireBaseToken", uID, token);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    //
+
                     Intent goToDash = new Intent(context, DashBoard.class);
                     context.startActivity(goToDash);
                 } else if (status == 1 || status == 2) {
                     Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
                 }
-                //Inform the user the login as been sucessful and store data on the pref settings
+                //Inform the user the login as been successful and store data on the pref settings
             } else if (action.equals("register")) {
 
                 if (status == 0) {
@@ -200,7 +232,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
             Log.d("data", data.toString());
         } catch (Exception e) {
-            Log.d("Error onPostexecute", e.toString());
+            e.printStackTrace();
         }
     }
 
