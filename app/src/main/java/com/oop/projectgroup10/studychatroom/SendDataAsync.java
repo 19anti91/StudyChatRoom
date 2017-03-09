@@ -31,8 +31,11 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
 
         String action = args[0];
         String userId = args[1];
-        String token = args[2];
-
+        String token = "";
+        //These values are used for generic reasons
+        String value1 = "";
+        String value2 = "";
+        String value3 = "";
 
         URL url;
         OutputStream outputPost;
@@ -44,7 +47,24 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
             String link = "http://www.passtrunk.com/OOPAPI/general.php";
             String data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
             data += "&" + URLEncoder.encode("userid", "UTF-8") + "=" + URLEncoder.encode(userId, "UTF-8");
-            data += "&" + URLEncoder.encode("token", "UTF-8") + "=" + token;
+            if (action.equals("updateFireBaseToken")) {
+                token = args[2];
+                data += "&" + URLEncoder.encode("token", "UTF-8") + "=" + token;
+            } else if (action.equals("updateFname")) {
+                value1 = args[2];
+                data += "&" + URLEncoder.encode("fname", "UTF-8") + "=" + value1;
+            } else if (action.equals("updateLname")) {
+                value1 = args[2];
+                data += "&" + URLEncoder.encode("lname", "UTF-8") + "=" + value1;
+            } else if (action.equals("updateEmail")) {
+                value1 = args[2];
+                data += "&" + URLEncoder.encode("emailaddress", "UTF-8") + "=" + value1;
+            } else if (action.equals("updateNotif")) {
+                value1 = args[2];
+                data += "&" + URLEncoder.encode("enableNotif", "UTF-8") + "=" + value1;
+            }
+
+
 
 
             url = new URL(link);

@@ -3,6 +3,7 @@ package com.oop.projectgroup10.studychatroom;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -53,7 +54,7 @@ public class DashBoard extends AppCompatActivity
         getMenuInflater().inflate(R.menu.dash_board, menu);
 
         //getinfo from preferences
-        SharedPreferences pref = this.getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         String userName = pref.getString("username", "");
         String userType = pref.getString("type", "");
@@ -107,7 +108,7 @@ public class DashBoard extends AppCompatActivity
 
     //Clear preferences. Can be used to log out
     public void clearPref() {
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = pref.edit();
         edit.clear();
         edit.commit();

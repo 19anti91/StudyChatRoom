@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
@@ -25,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Button loginBtn = (Button) findViewById(R.id.loginBtn);
         Button registerBtn = (Button) findViewById(R.id.registerBtn);
-        SharedPreferences pref = getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         int rememberMe = pref.getInt("rememberme", 0);
         if (!hasInternetAccess()) {
             Toast.makeText(LoginActivity.this, "You have no internet Connection at the moment. Please try again later", Toast.LENGTH_LONG).show();

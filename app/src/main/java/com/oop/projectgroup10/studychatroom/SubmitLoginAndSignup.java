@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -153,7 +154,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
 
             if (action.equals("login")) {
-                final SharedPreferences pref = this.context.getApplicationContext().getSharedPreferences("StudyChatRoom", 0);
+                final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
                 SharedPreferences.Editor editor = pref.edit();
                 final String uID = data.getString("userid");
 
@@ -173,7 +174,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                     editor.putString("emailaddress", data.getString("emailaddress"));
                     editor.putString("username", data.getString("username"));
                     editor.putString("type", data.getString("type"));
-                    editor.putString("notifsettings", data.getString("notifsettings"));
+                    editor.putInt("notifsettings", Integer.valueOf(data.getString("notifsettings")));
                     if (rememberMe.equals("true")) {
                         editor.putInt("rememberme", 1);
                     }
