@@ -93,7 +93,8 @@ public class DashBoard extends AppCompatActivity
 
 
         if (id == R.id.createRoom) {
-
+            Intent goToCreateRoom = new Intent(this, CreateRoom.class);
+            startActivity(goToCreateRoom);
         } else if (id == R.id.settings) {
             Intent goToSettings = new Intent(this, MemberSettings.class);
             startActivity(goToSettings);

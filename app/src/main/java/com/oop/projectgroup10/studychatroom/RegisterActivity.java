@@ -26,7 +26,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        //To match that both passwords are ok
+        //To check that both passwords are ok
         EditText passwordConfirm = (EditText) findViewById(R.id.confirmpassword);
         final TextView passMatch = (TextView) findViewById(R.id.passMatch);
         TextWatcher passwordValidation = new TextWatcher() {

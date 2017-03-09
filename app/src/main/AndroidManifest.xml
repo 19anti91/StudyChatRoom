@@ -35,7 +35,6 @@
             android:name=".DashBoard"
             android:configChanges="orientation"
             android:label="@string/title_activity_dash_board"
-
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MemberSettings"
@@ -53,7 +52,7 @@
             </intent-filter>
         </service>
 
-
+        <activity android:name=".CreateRoom"></activity>
     </application>
 
 </manifest>

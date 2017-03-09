@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.MessageDigest;
 
 /**
  * Created by no717490 on 3/7/2017.
@@ -41,6 +42,7 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
         OutputStream outputPost;
         BufferedReader in;
         HttpURLConnection client;
+        MessageDigest md;
         String response = "";
 
         try {
@@ -62,6 +64,24 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
             } else if (action.equals("updateNotif")) {
                 value1 = args[2];
                 data += "&" + URLEncoder.encode("enableNotif", "UTF-8") + "=" + value1;
+            } else if (action.equals("createRoom")) {
+                md = MessageDigest.getInstance("SHA-256");
+
+                value1 = args[2];
+                value2 = args[3];
+                value3 = args[4];
+                md.update(value2.getBytes());
+                byte byteData[] = md.digest();
+
+                StringBuilder encPass = new StringBuilder();
+                for (int i = 0; i < byteData.length; i++) {
+                    encPass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+                }
+
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+                data += "&" + URLEncoder.encode("roomPassword", "UTF-8") + "=" + encPass.toString();
+                data += "&" + URLEncoder.encode("isPrivate", "UTF-8") + "=" + value3;
+
             }
 
 
