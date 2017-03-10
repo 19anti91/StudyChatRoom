@@ -14,6 +14,8 @@
         android:theme="@style/studyChat">
         <activity
             android:name=".SplashScreen"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:theme="@style/studyChat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,13 +31,15 @@
         <activity
             android:name=".RegisterActivity"
             android:configChanges="orientation"
+            android:parentActivityName=".LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/studyChat" />
         <activity
             android:name=".DashBoard"
             android:configChanges="orientation"
-            android:label="@string/title_activity_dash_board"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait" />
+        android:label="@string/title_activity_dash_board"
+        android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MemberSettings"
             android:screenOrientation="portrait"
@@ -52,7 +56,21 @@
             </intent-filter>
         </service>
 
-        <activity android:name=".CreateRoom"></activity>
+        <activity
+            android:name=".CreateRoom"
+            android:configChanges="orientation"
+            android:parentActivityName=".DashBoard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ChatRooms"
+            android:label="@string/title_activity_chat_rooms"
+            android:parentActivityName=".DashBoard"
+            android:theme="@style/studyChat.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
+        </activity>
+        <activity android:name=".PrivateMessage"></activity>
     </application>
 
 </manifest>

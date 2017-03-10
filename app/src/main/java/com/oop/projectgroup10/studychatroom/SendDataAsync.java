@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -121,7 +124,32 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
+    protected void onPostExecute(String response) {
+
+        JSONObject returnValues;
+
+        int status;
+        String statusMessage;
+        String action;
+        JSONObject data;
+        try {
+            returnValues = new JSONObject(response);
+            status = Integer.valueOf(returnValues.getString("status"));
+            statusMessage = returnValues.getString("statusMessage");
+            data = returnValues.getJSONObject("data");
+            action = data.getString("action");
+
+            if (status == 0) {
+                Toast.makeText(act, "Room Created Successfully", Toast.LENGTH_LONG).show();
+            }
+
+
+            Log.d("data", data.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+
 }
+

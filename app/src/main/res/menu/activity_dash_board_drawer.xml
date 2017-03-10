@@ -7,6 +7,14 @@
             android:icon="@drawable/ic_plussign"
             android:title="@string/createroom" />
         <item
+            android:id="@+id/privateMessageRoom"
+            android:icon="@drawable/ic_chat"
+            android:title="@string/privatemessage" />
+        <item
+            android:id="@+id/chatRoom"
+            android:icon="@drawable/ic_group"
+            android:title="@string/chatrooms" />
+        <item
             android:id="@+id/settings"
             android:icon="@drawable/ic_gear"
             android:title="@string/settings" />

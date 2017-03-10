@@ -82,9 +82,10 @@ public class CreateRoom extends AppCompatActivity {
 
     public void createRoom(View v) {
 
-        if (!getRoomName().isEmpty() && !getPassword().isEmpty() && passwordOK) {
+        if (!getRoomName().isEmpty() && ((getIsPassProt() && !getPassword().isEmpty() && passwordOK) || !getIsPassProt())) {
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             new SendDataAsync(this.getApplicationContext(), this).execute("createRoom", String.valueOf(pref.getInt("userid", 0)), getRoomName(), getPassword(), isPrivate());
+            finish();
         } else {
             Toast.makeText(this, "Please check the room name and password", Toast.LENGTH_LONG).show();
         }
@@ -118,8 +119,8 @@ public class CreateRoom extends AppCompatActivity {
         finish();
     }
 
-    public String getIsPassProt() {
+    public boolean getIsPassProt() {
         CheckBox isPassProt = (CheckBox) findViewById(R.id.passProtect);
-        return String.valueOf(isPassProt.isChecked());
+        return isPassProt.isChecked();
     }
 }

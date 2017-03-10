@@ -100,6 +100,8 @@ public class DashBoard extends AppCompatActivity
             startActivity(goToSettings);
         } else if (id == R.id.logout) {
             clearPref();
+        } else if (id == R.id.chatRoom) {
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
