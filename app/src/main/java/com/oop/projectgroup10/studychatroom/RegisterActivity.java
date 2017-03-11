@@ -2,9 +2,11 @@ package com.oop.projectgroup10.studychatroom;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -16,13 +18,18 @@ public class RegisterActivity extends AppCompatActivity {
 
     Boolean passwordOK;
 
+    public static boolean isValidEmail(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
-        //To match that both passwords are ok
+        //To check that both passwords are ok
         EditText passwordConfirm = (EditText) findViewById(R.id.confirmpassword);
         final TextView passMatch = (TextView) findViewById(R.id.passMatch);
         TextWatcher passwordValidation = new TextWatcher() {
@@ -55,6 +62,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void submitRegistration(View v) {
 
+        boolean isValid = isValidEmail(getEmail());
+        if (!isValid) {
+            Toast.makeText(this, "Invalid email address. Please check again.", Toast.LENGTH_LONG).show();
+        } else
         if (getFname().isEmpty() || getLname().isEmpty() || getUsername().isEmpty() || getEmail().isEmpty() || getUserType().isEmpty() || !passwordOK) {
             Toast.makeText(this, "Please note that all the fields are required. Passwords must match", Toast.LENGTH_LONG).show();
         } else {
@@ -62,7 +73,6 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
     }
-//TODO REGEX to check email
 
     //getters
     public String getFname() {

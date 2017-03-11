@@ -1,0 +1,39 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <PreferenceCategory android:title="General Settings">
+
+        <EditTextPreference
+        android:inputType="textCapWords"
+            android:key="firstName"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+            android:title="First Name" />
+
+        <EditTextPreference
+            android:inputType="textCapWords"
+            android:key="lastName"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Last Name" />
+
+
+        <EditTextPreference
+            android:inputType="textCapWords"
+            android:key="emailAddress"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Email Address" />
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Notification Settings">
+        <SwitchPreference
+            android:key="enableNotif"
+            android:title="Enable Notifications" />
+    </PreferenceCategory>
+</PreferenceScreen>

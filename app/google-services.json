@@ -1,0 +1,58 @@
+{
+  "project_info": {
+    "project_number": "338611432116",
+    "firebase_url": "https://studychatroom-15737.firebaseio.com",
+    "project_id": "studychatroom-15737",
+    "storage_bucket": "studychatroom-15737.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338611432116:android:a3325a481aae6e58",
+        "android_client_info": {
+          "package_name": "com.oop.projectgroup10.studychatroom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "338611432116-ltfo1n8dd4c7om0ran2bogdggjnqm9gc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.oop.projectgroup10.studychatroom",
+            "certificate_hash": "af88a4a4d517abce8836112d3d412c015b377d6a"
+          }
+        },
+        {
+          "client_id": "338611432116-3ib9lmepktk7ijia2pi9eg9kd9u89nrh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAosNeTxGesgvGq-j1frZRzn1d7QSPxBCQ"
+        },
+        {
+          "current_key": "AIzaSyANItmwP_muCI3pR5qGpCKTJXjJ7ibZ-o8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "338611432116-3ib9lmepktk7ijia2pi9eg9kd9u89nrh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
