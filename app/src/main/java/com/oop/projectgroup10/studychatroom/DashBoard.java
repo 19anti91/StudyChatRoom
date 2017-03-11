@@ -102,6 +102,9 @@ public class DashBoard extends AppCompatActivity
             clearPref();
         } else if (id == R.id.chatRoom) {
 
+        } else if (id == R.id.privateMessageRoom) {
+            Intent goToPrivMsgRoom = new Intent(this, PrivateMessage.class);
+            startActivity(goToPrivMsgRoom);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

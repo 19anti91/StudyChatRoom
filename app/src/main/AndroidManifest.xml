@@ -37,8 +37,8 @@
         <activity
             android:name=".DashBoard"
             android:configChanges="orientation"
-            android:screenOrientation="portrait" />
-        android:label="@string/title_activity_dash_board"
+            android:label="@string/title_activity_dash_board"
+            android:screenOrientation="portrait"
         android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MemberSettings"

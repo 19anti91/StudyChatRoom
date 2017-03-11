@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 
 public class MemberSettings extends PreferenceActivity {
 
+    //TODO change user icon
 
     Context context = null;
     Activity act = this;
