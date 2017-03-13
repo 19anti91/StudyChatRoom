@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 
 public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
+    String rememberMe;
     private Context context;
     private Activity act;
 
@@ -37,7 +38,6 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         this.act = act;
     }
 
-    String rememberMe;
     protected String doInBackground(String... args) {
 
         String action;
@@ -50,6 +50,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         String data = "";
         String usertype;
         String response = "";
+        String avatar = "";
 
 
         URL url;
@@ -89,6 +90,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 emailaddress = args[5];
                 usertype = args[6];
                 hashkey = new SimpleDateFormat().toString();
+                avatar = args[7];
 
 
 
@@ -100,6 +102,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("emailAddress", "UTF-8") + "=" + URLEncoder.encode(emailaddress, "UTF-8");
                 data += "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(hashkey, "UTF-8");
                 data += "&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(usertype, "UTF-8");
+                data += "&" + URLEncoder.encode("icon", "UTF-8") + "=" + URLEncoder.encode(avatar, "UTF-8");
                 Log.e("Link", data);
             }
 
@@ -175,6 +178,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                     editor.putString("username", data.getString("username"));
                     editor.putString("type", data.getString("type"));
                     editor.putInt("notifsettings", Integer.valueOf(data.getString("notifsettings")));
+                    editor.putInt("usericon", Integer.valueOf(data.getString("usericon")));
                     if (rememberMe.equals("true")) {
                         editor.putInt("rememberme", 1);
                     }

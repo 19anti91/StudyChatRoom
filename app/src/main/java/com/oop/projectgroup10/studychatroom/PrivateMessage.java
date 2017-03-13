@@ -46,16 +46,17 @@ public class PrivateMessage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_message);
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor edit = pref.edit();
         ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Private Conversation with " + pref.getString("currentPrivUser", ""));
         actionBar.setDefaultDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Private Messages");
+
         layout = (LinearLayout) findViewById(R.id.privMsgLayout);
         view = (ViewGroup) findViewById(R.id.privMsgLayout);
 
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final SharedPreferences.Editor edit = pref.edit();
-
-
+        //TODO Test send message
+        //TODO Get previous messages and populate(somehow)
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -92,8 +93,11 @@ public class PrivateMessage extends AppCompatActivity {
     public void sendMessage(View v) {
 
         View view = LayoutInflater.from(this).inflate(R.layout.msg_from_me, null);
-        //  new SendDataAsync(null, null).execute("").execute("getAllUsers", "asdasd", "asdasd");
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String toUsername = "";
+
         if (!getMessage().isEmpty()) {
+            new MessageAsync(getApplicationContext(), this, view).execute("privMsg", String.valueOf(pref.getInt("userid", 0)), toUsername, getMessage());
             layout.addView(view);
             TextView msgFromMe = (TextView) findViewById(R.id.msgFromMeTxt);
             msgFromMe.setId(generateViewId());

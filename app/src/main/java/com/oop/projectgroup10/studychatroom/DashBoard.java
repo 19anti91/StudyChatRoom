@@ -24,6 +24,8 @@ public class DashBoard extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        new SendDataAsync(getApplicationContext(), this).execute("getAllUsers", String.valueOf(pref.getInt("userid", 0)));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -103,7 +105,9 @@ public class DashBoard extends AppCompatActivity
         } else if (id == R.id.chatRoom) {
 
         } else if (id == R.id.privateMessageRoom) {
-            Intent goToPrivMsgRoom = new Intent(this, PrivateMessage.class);
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+            new SendDataAsync(getApplicationContext(), this).execute("getAllUsers", String.valueOf(pref.getInt("userid", 0)));
+            Intent goToPrivMsgRoom = new Intent(this, PrivateMessageUserList.class);
             startActivity(goToPrivMsgRoom);
         }
 

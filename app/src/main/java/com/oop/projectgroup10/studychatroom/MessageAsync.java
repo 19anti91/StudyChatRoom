@@ -3,6 +3,7 @@ package com.oop.projectgroup10.studychatroom;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -12,6 +13,13 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -46,9 +54,9 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... args) {
-        /*String action = args[0];
+        String action = args[0];
         String senderId = args[1];
-        String receiverId = args[2];
+        String receiverUsername = args[2];
         String message = args[3];
 
 
@@ -59,10 +67,10 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
         String response = "";
 
         try {
-            String link = "http://www.passtrunk.com/OOPAPI/messages.php";
+            String link = "http://www.passtrunk.com/OOPAPI/fcmhandler.php";
             String data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
-            data += "&" + URLEncoder.encode("senderId", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
-            data += "&" + URLEncoder.encode("receiverId", "UTF-8") + "=" + URLEncoder.encode(receiverId, "UTF-8");
+            data += "&" + URLEncoder.encode("from", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
+            data += "&" + URLEncoder.encode("to", "UTF-8") + "=" + URLEncoder.encode(receiverUsername, "UTF-8");
             data += "&" + URLEncoder.encode("message", "UTF-8") + "=" + URLEncoder.encode(message, "UTF-8");
 
             url = new URL(link);
@@ -94,7 +102,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
         } catch (Exception e) {
             e.printStackTrace();
-        }*/
+        }
 
         return null;
     }
@@ -102,7 +110,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
 
-        processFinish(result);
+        //processFinish(result);
 
     }
 
