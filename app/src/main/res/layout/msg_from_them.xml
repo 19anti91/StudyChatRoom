@@ -15,30 +15,20 @@
 
         <ImageView
             android:id="@+id/imageView3"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="0dp"
-            android:layout_weight="3"
-            android:src="@drawable/common_google_signin_btn_icon_dark" />
-
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginRight="-15dp"
-            android:layout_marginTop="6.5dp"
-            android:layout_weight="1"
-            android:src="@drawable/arrow2" />
-
-        <TextView
-            android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_weight="6"
+            android:layout_marginTop="0dp"
+            android:layout_weight="0.86"
+            android:src="@drawable/common_google_signin_btn_icon_dark" />
+
+        <TextView
+            android:id="@+id/msgFromThemTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="6.72"
             android:background="@drawable/rounded1"
             android:padding="16dp"
-            android:text="Android charting application xml ui design. Android charting application xml ui design tutorial with example. Android charting application xml ui design. Android charting application xml ui design. "
+            android:text=""
             android:textColor="#000" />
 
     </LinearLayout>

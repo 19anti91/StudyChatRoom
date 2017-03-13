@@ -39,7 +39,7 @@
             android:configChanges="orientation"
             android:label="@string/title_activity_dash_board"
             android:screenOrientation="portrait"
-        android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MemberSettings"
             android:screenOrientation="portrait"
@@ -55,6 +55,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+        <service android:name=".ReceiveMessageService" />
 
         <activity
             android:name=".CreateRoom"
@@ -70,7 +71,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
         </activity>
-        <activity android:name=".PrivateMessage"></activity>
+        <activity android:name=".PrivateMessage" />
+        <activity android:name=".SelectPrivMsg"></activity>
     </application>
 
 </manifest>
