@@ -4,8 +4,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -28,7 +30,14 @@ public class NotificationService extends FirebaseMessagingService {
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
+            //TODO try to send to activity
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putInt("hasMessage", 1);
+            editor.putString("message", remoteMessage.getData().toString());
+            editor.apply();
+
         }
 
         // Check if message contains a notification payload.

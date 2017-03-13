@@ -8,9 +8,12 @@
     tools:context="com.oop.projectgroup10.studychatroom.PrivateMessage">
 
     <ScrollView
+        android:id="@+id/scrollPriv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="20">
+        android:layout_weight="20"
+        android:fadeScrollbars="false"
+        android:scrollbars="none">
 
         <LinearLayout
             android:id="@+id/privMsgLayout"
