@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.iid.InstanceID;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONObject;
 
@@ -190,14 +191,16 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                String fbinstance = InstanceID.getInstance(context).getId();
+                                String fbinstance = InstanceID.getInstance(act).getId();
 
                                 String authorizeEnt = "338611432116";
                                 String scope = "GCM";
                                 try {
-                                    InstanceID.getInstance(context).deleteInstanceID();
-                                    String newIID = InstanceID.getInstance(context).getId();
-                                    String token = InstanceID.getInstance(context).getToken(authorizeEnt, scope);
+                                    //InstanceID.getInstance(act).deleteInstanceID();
+
+                                    //String newIID = InstanceID.getInstance(act).getId();
+                                    //String token = InstanceID.getInstance(act).getToken(authorizeEnt, scope);
+                                    String token = FirebaseInstanceId.getInstance().getToken();
 
                                     Log.d("TOKEN", token);
                                     new SendDataAsync(context, act).execute("updateFireBaseToken", uID, token);

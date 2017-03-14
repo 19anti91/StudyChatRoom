@@ -61,7 +61,7 @@ public class PrivateMessageUserList extends AppCompatActivity {
             e.printStackTrace();
         }
         customAdapter = new CustomListAdapter(this, userlist, userIcon);
-
+//final Integer[] icon = userIcon;
         mainListView.setAdapter(customAdapter);
 
         mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -72,6 +72,7 @@ public class PrivateMessageUserList extends AppCompatActivity {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString("currentPrivUser", username);
+                //              editor.putInt("currentPrivUserIcon",icon[position]);
                 editor.apply();
 
                 Intent goToPrivMsgRoom = new Intent(act, PrivateMessage.class);
@@ -89,7 +90,6 @@ public class PrivateMessageUserList extends AppCompatActivity {
 
         public CustomListAdapter(Activity context, String[] itemname, Integer[] imgid) {
             super(context, R.layout.user_list, itemname);
-            // TODO Auto-generated constructor stub
 
             this.context = context;
             this.itemname = itemname;

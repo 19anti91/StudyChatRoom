@@ -23,9 +23,9 @@
             android:textColor="#000" />
 
         <ImageView
-            android:id="@+id/userIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/messageFromMeIcon"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
             android:layout_marginTop="7dp"
             android:layout_weight="0.72"
             android:src="@drawable/common_google_signin_btn_icon_dark" />

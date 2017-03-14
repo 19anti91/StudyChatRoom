@@ -72,7 +72,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
         </activity>
-        <activity android:name=".PrivateMessage" />
+        <activity
+            android:name=".PrivateMessage"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PrivateMessageUserList"
             android:configChanges="orientation"

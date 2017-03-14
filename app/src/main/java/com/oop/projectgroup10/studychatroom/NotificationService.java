@@ -34,13 +34,18 @@ public class NotificationService extends FirebaseMessagingService {
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
+            String message = remoteMessage.getData().get("message");
+            String fromUser = remoteMessage.getData().get("userFrom");
             //TODO try to send to activity if app open, send notif otherwise
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = pref.edit();
             editor.putInt("hasMessage", 1);
-            editor.putString("message", remoteMessage.getData().toString());
+            editor.putString("message", message);
+            editor.putString("userFrom", fromUser);
             editor.apply();
+            Log.d("FROM", fromUser);
+            Log.d("Message", message);
 
         }
 
