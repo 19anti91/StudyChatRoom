@@ -199,6 +199,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                                     String newIID = InstanceID.getInstance(context).getId();
                                     String token = InstanceID.getInstance(context).getToken(authorizeEnt, scope);
 
+                                    Log.d("TOKEN", token);
                                     new SendDataAsync(context, act).execute("updateFireBaseToken", uID, token);
                                 } catch (Exception e) {
                                     e.printStackTrace();

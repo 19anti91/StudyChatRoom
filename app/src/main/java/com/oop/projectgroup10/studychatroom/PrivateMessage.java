@@ -83,7 +83,7 @@ public class PrivateMessage extends AppCompatActivity {
                 });
 
             }
-        }, 0, 1000);
+        }, 0, 500);
 
 
     }
@@ -94,7 +94,7 @@ public class PrivateMessage extends AppCompatActivity {
 
         View view = LayoutInflater.from(this).inflate(R.layout.msg_from_me, null);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String toUsername = "";
+        String toUsername = pref.getString("currentPrivUser", "");
 
         if (!getMessage().isEmpty()) {
             new MessageAsync(getApplicationContext(), this, view).execute("privMsg", String.valueOf(pref.getInt("userid", 0)), toUsername, getMessage());

@@ -28,6 +28,7 @@ public class Firebase extends FirebaseInstanceIdService {
         SharedPreferences pref = getBaseContext().getSharedPreferences("StudyChatRoom", 0);
         SharedPreferences.Editor edit = pref.edit();
         edit.putString("firebasetoken", refreshedToken);
+        edit.apply();
 
     }
 

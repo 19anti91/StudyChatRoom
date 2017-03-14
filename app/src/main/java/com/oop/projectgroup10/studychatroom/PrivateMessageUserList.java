@@ -35,6 +35,9 @@ public class PrivateMessageUserList extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("currentPrivUser", "");
+        editor.apply();
         new SendDataAsync(getApplicationContext(), this).execute("getAllUsers", String.valueOf(pref.getInt("userid", 0)));
         mainListView = (ListView) findViewById(R.id.userList);
 
