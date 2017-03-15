@@ -37,6 +37,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
     View view;
     LinearLayout layout;
 
+    String action;
     public MessageAsync(Context context, Activity act, View view, LinearLayout layout) {
         this.context = context;
         this.act = act;
@@ -58,7 +59,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... args) {
-        String action = args[0];
+        action = args[0];
         String senderId = args[1];
         String receiverUsername = args[2];
         String message;
@@ -124,8 +125,9 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-
+        if (action.equals("getPrivMsg")) {
         processFinish(result);
+        }
 
     }
 
@@ -167,11 +169,12 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
         TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromMeTxt);
         msgFromMe.setId(generateViewId());
         msgFromMe.setText(msg);
-        ImageView icon = getIcon(pref.getInt("usericon", 0), R.id.messageFromMeIcon);
+        ImageView icon = getIcon(pref.getInt("usericon", 7), R.id.messageFromMeIcon);
             layout.invalidate();
 
 
     }
+
 
     public void populateReceivedMsg(String msg) {
 
@@ -180,12 +183,12 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
         // LinearLayout layout = (LinearLayout) view.findViewById(R.id.privMsgLayout);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
         String toUsername = pref.getString("currentPrivUser", "");
-
+        int privUserIcon = pref.getInt("currentPrivUserIcon", 7);
 
         layout.addView(view);
         TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
-        ImageView icon = getIcon(pref.getInt("usericon", 0), R.id.msgFromThemIcon);
-
+        ImageView icon = getIcon(privUserIcon, R.id.msgFromThemIcon);
+        Log.d("ICON", String.valueOf(icon));
         msgFromMe.setId(generateViewId());
         msgFromMe.setText(msg);
         layout.invalidate();
@@ -195,6 +198,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
     public ImageView getIcon(int icon, int id) {
         ImageView imageView = (ImageView) view.findViewById(id);
+        imageView.setId(generateViewId());
         switch (icon) {
             case 0:
                 imageView.setImageResource(R.drawable.ic_femalelight);

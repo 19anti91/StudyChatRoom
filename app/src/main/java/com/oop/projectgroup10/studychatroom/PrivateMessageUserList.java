@@ -29,7 +29,7 @@ public class PrivateMessageUserList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_message_user_list);
-
+//TODO block someone using onlongclicklistener
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Select User");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -61,7 +61,7 @@ public class PrivateMessageUserList extends AppCompatActivity {
             e.printStackTrace();
         }
         customAdapter = new CustomListAdapter(this, userlist, userIcon);
-//final Integer[] icon = userIcon;
+        final Integer[] icon = userIcon;
         mainListView.setAdapter(customAdapter);
 
         mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -72,7 +72,8 @@ public class PrivateMessageUserList extends AppCompatActivity {
                 SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
                 SharedPreferences.Editor editor = pref.edit();
                 editor.putString("currentPrivUser", username);
-                //              editor.putInt("currentPrivUserIcon",icon[position]);
+                editor.putInt("currentPrivUserIcon", icon[position]);
+
                 editor.apply();
 
                 Intent goToPrivMsgRoom = new Intent(act, PrivateMessage.class);

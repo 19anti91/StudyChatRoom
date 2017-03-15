@@ -1,9 +1,7 @@
 package com.oop.projectgroup10.studychatroom;
 
-import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,8 +13,6 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-
-import java.util.List;
 
 import static com.google.android.gms.internal.zzt.TAG;
 
@@ -36,23 +32,36 @@ public class NotificationService extends FirebaseMessagingService {
         if (remoteMessage.getData().size() > 0) {
             String message = remoteMessage.getData().get("message");
             String fromUser = remoteMessage.getData().get("userFrom");
-            //TODO try to send to activity if app open, send notif otherwise
+
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = pref.edit();
-            editor.putInt("hasMessage", 1);
-            editor.putString("message", message);
-            editor.putString("userFrom", fromUser);
-            editor.apply();
+            if (!fromUser.equals(pref.getString("currentPrivUser", "0")) /*|| pref.getString("currentPrivUser","0").equals("")*/) {
+
+                sendNotification("New message from " + fromUser, message);
+            } else {
+
+                editor.putInt("hasMessage", 1);
+                editor.putString("message", message);
+                editor.putString("userFrom", fromUser);
+
+                editor.apply();
+
+            }
+
             Log.d("FROM", fromUser);
             Log.d("Message", message);
+
 
         }
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            sendNotification(remoteMessage.getData().toString());
+            Log.d("Title", remoteMessage.getData().toString());
+            //sendNotification(remoteMessage.getData().toString());
+            sendNotification("message from noel", "test");
+
         }
 
 
@@ -61,13 +70,7 @@ public class NotificationService extends FirebaseMessagingService {
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
-    public boolean isForeground(String myPackage) {
-        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> runningTaskInfo = manager.getRunningTasks(1);
-        ComponentName componentInfo = runningTaskInfo.get(0).topActivity;
-        return componentInfo.getPackageName().equals(myPackage);
-    }
-    private void sendNotification(String messageBody) {
+    private void sendNotification(String title, String message) {
 
         Intent intent = new Intent(this, DashBoard.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -77,8 +80,8 @@ public class NotificationService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_gear)
-                .setContentTitle("FCM Message")
-                .setContentText(messageBody)
+                .setContentTitle(title)
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
@@ -88,4 +91,6 @@ public class NotificationService extends FirebaseMessagingService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
+
+
 }

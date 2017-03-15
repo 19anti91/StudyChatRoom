@@ -34,8 +34,6 @@ public class Firebase extends FirebaseInstanceIdService {
 
     private void sendRegistrationToServer(String token, String userid) {
 
-
-        // TODO: Implement this method to send token to your app server.
     }
 
 }

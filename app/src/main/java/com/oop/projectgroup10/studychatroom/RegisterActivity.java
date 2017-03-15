@@ -80,6 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
         getAvatar();
     }
 
+    //TODO fix GUI
     public void submitRegistration(View v) {
 
         boolean isValid = isValidEmail(getEmail());

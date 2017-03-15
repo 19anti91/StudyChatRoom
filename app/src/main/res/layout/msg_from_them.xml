@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout1"
         android:orientation="horizontal"
-        android:paddingRight="10dp">
+        android:paddingRight="60dp">
 
         <ImageView
             android:id="@+id/msgFromThemIcon"

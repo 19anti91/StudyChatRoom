@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PrivateMessage extends AppCompatActivity {
 
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+    static boolean isActive = false;
     public ListView usersFound;
     ViewGroup view;
 
@@ -44,6 +45,17 @@ public class PrivateMessage extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        isActive = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isActive = false;
+    }
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_message);
@@ -118,6 +130,13 @@ public class PrivateMessage extends AppCompatActivity {
         }
     }
 
+    //TODO emojis
+/*
+    public String getEmojiByUnicode(int unicode){
+        return new String(Character.toChars(unicode));
+        msgFromMe.setText(getEmojiByUnicode(0x1F60A));
+        http://apps.timwhitlock.info/emoji/tables/unicode
+    }*/
     public void populateReceivedMsg(String msg, String from) {
 
 
@@ -129,7 +148,8 @@ public class PrivateMessage extends AppCompatActivity {
 
             layout.addView(view);
             TextView msgFromMe = (TextView) findViewById(R.id.msgFromThemTxt);
-            ImageView icon = getIcon(pref.getInt("usericon", 0), R.id.msgFromThemIcon);
+            //int privUserIcon = pref.getInt("currentPrivUserIcon",7);
+            ImageView icon = getIcon(pref.getInt("currentPrivUserIcon", 7), R.id.msgFromThemIcon);
 
             msgFromMe.setId(generateViewId());
             msgFromMe.setText(msg);

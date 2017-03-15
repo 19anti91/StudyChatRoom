@@ -86,6 +86,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
         </activity>
+        <activity
+            android:name=".ChatRoomsList"
+            android:screenOrientation="portrait"
+            android:theme="@style/studyChat" />
     </application>
 
 </manifest>
