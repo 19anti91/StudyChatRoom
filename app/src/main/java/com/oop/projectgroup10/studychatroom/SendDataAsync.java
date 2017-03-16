@@ -88,6 +88,12 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("roomPassword", "UTF-8") + "=" + encPass.toString();
                 data += "&" + URLEncoder.encode("isPrivate", "UTF-8") + "=" + value3;
 
+            } else if (action.equals("joinChatRoom")) {
+                value1 = args[2];
+                value2 = args[3];
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+                data += "&" + URLEncoder.encode("userid", "UTF-8") + "=" + value2;
+
             }
 
 
@@ -149,6 +155,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 data = returnValues.getJSONObject("data");
                 if (status == 0) {
                     Toast.makeText(act, "Room Created Successfully", Toast.LENGTH_LONG).show();
+                    act.finish();
+                } else if (status == 1) {
+                    Toast.makeText(act, "The Room name is taken", Toast.LENGTH_LONG).show();
                 }
             } else if (action.equals("getAllUsers")) {
                 userList = returnValues.getJSONArray("data");

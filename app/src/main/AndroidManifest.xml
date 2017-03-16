@@ -90,6 +90,15 @@
             android:name=".ChatRoomsList"
             android:screenOrientation="portrait"
             android:theme="@style/studyChat" />
+        <activity
+            android:name=".ChatRoomsTwoTabs"
+            android:label="@string/title_activity_chat_rooms_two_tabs"
+            android:parentActivityName=".DashBoard"
+            android:theme="@style/studyChat.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
+        </activity>
     </application>
 
 </manifest>
