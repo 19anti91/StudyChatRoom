@@ -2,10 +2,13 @@ package com.oop.projectgroup10.studychatroom;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
@@ -22,9 +25,9 @@ import java.security.MessageDigest;
  */
 
 public class SendDataAsync extends AsyncTask<String, Void, String> {
+    String action;
     private Context context;
     private Activity act;
-
     public SendDataAsync(Context context, Activity act) {
         this.context = context;
         this.act = act;
@@ -33,7 +36,7 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... args) {
 
-        String action = args[0];
+        action = args[0];
         String userId = args[1];
         String token = "";
         //These values are used for generic reasons
@@ -47,9 +50,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
         HttpURLConnection client;
         MessageDigest md;
         String response = "";
-
+        String link;
         try {
-            String link = "http://www.passtrunk.com/OOPAPI/general.php";
+            link = "http://www.passtrunk.com/OOPAPI/general.php";
             String data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
             data += "&" + URLEncoder.encode("userid", "UTF-8") + "=" + URLEncoder.encode(userId, "UTF-8");
             if (action.equals("updateFireBaseToken")) {
@@ -84,8 +87,6 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
                 data += "&" + URLEncoder.encode("roomPassword", "UTF-8") + "=" + encPass.toString();
                 data += "&" + URLEncoder.encode("isPrivate", "UTF-8") + "=" + value3;
-
-            } else if (action.equals("getAllUsers")) {
 
             }
 
@@ -132,24 +133,34 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
 
         int status;
         String statusMessage;
-        String action;
-        JSONObject data;
+
+        JSONObject data = null;
+        JSONArray userList;
+        JSONArray chatRoomList;
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
+        SharedPreferences.Editor editor = pref.edit();
         try {
             returnValues = new JSONObject(response);
             status = Integer.valueOf(returnValues.getString("status"));
             statusMessage = returnValues.getString("statusMessage");
-            data = returnValues.getJSONObject("data");
-            action = data.getString("action");
+
 
             if (action.equals("createRoom")) {
+                data = returnValues.getJSONObject("data");
                 if (status == 0) {
                     Toast.makeText(act, "Room Created Successfully", Toast.LENGTH_LONG).show();
                 }
             } else if (action.equals("getAllUsers")) {
-
+                userList = returnValues.getJSONArray("data");
+                editor.putString("userList", userList.toString());
+                editor.apply();
+            } else if (action.equals("getAllChatRooms")) {
+                chatRoomList = returnValues.getJSONArray("data");
+                editor.putString("chatRoomList", chatRoomList.toString());
+                editor.apply();
             }
 
-            Log.d("data", data.toString());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

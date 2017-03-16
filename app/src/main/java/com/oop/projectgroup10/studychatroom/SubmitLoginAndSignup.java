@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.iid.InstanceID;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONObject;
 
@@ -29,6 +30,7 @@ import java.text.SimpleDateFormat;
 
 public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
+    String rememberMe;
     private Context context;
     private Activity act;
 
@@ -37,7 +39,6 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         this.act = act;
     }
 
-    String rememberMe;
     protected String doInBackground(String... args) {
 
         String action;
@@ -50,6 +51,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
         String data = "";
         String usertype;
         String response = "";
+        String avatar = "";
 
 
         URL url;
@@ -89,6 +91,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 emailaddress = args[5];
                 usertype = args[6];
                 hashkey = new SimpleDateFormat().toString();
+                avatar = args[7];
 
 
 
@@ -100,6 +103,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("emailAddress", "UTF-8") + "=" + URLEncoder.encode(emailaddress, "UTF-8");
                 data += "&" + URLEncoder.encode("date", "UTF-8") + "=" + URLEncoder.encode(hashkey, "UTF-8");
                 data += "&" + URLEncoder.encode("type", "UTF-8") + "=" + URLEncoder.encode(usertype, "UTF-8");
+                data += "&" + URLEncoder.encode("icon", "UTF-8") + "=" + URLEncoder.encode(avatar, "UTF-8");
                 Log.e("Link", data);
             }
 
@@ -175,6 +179,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                     editor.putString("username", data.getString("username"));
                     editor.putString("type", data.getString("type"));
                     editor.putInt("notifsettings", Integer.valueOf(data.getString("notifsettings")));
+                    editor.putInt("usericon", Integer.valueOf(data.getString("usericon")));
                     if (rememberMe.equals("true")) {
                         editor.putInt("rememberme", 1);
                     }
@@ -186,15 +191,18 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                String fbinstance = InstanceID.getInstance(context).getId();
+                                String fbinstance = InstanceID.getInstance(act).getId();
 
                                 String authorizeEnt = "338611432116";
                                 String scope = "GCM";
                                 try {
-                                    InstanceID.getInstance(context).deleteInstanceID();
-                                    String newIID = InstanceID.getInstance(context).getId();
-                                    String token = InstanceID.getInstance(context).getToken(authorizeEnt, scope);
+                                    //InstanceID.getInstance(act).deleteInstanceID();
 
+                                    //String newIID = InstanceID.getInstance(act).getId();
+                                    //String token = InstanceID.getInstance(act).getToken(authorizeEnt, scope);
+                                    String token = FirebaseInstanceId.getInstance().getToken();
+
+                                    Log.d("TOKEN", token);
                                     new SendDataAsync(context, act).execute("updateFireBaseToken", uID, token);
                                 } catch (Exception e) {
                                     e.printStackTrace();

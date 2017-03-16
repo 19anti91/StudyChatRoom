@@ -24,33 +24,53 @@ public class NotificationService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage remoteMessage) {
         // ...
 
-        // TODO(developer): Handle FCM messages here.
+
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
-            //TODO try to send to activity
+            String message = remoteMessage.getData().get("message");
+            String fromUser = remoteMessage.getData().get("userFrom");
+
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = pref.edit();
-            editor.putInt("hasMessage", 1);
-            editor.putString("message", remoteMessage.getData().toString());
-            editor.apply();
+            if (!fromUser.equals(pref.getString("currentPrivUser", "0")) /*|| pref.getString("currentPrivUser","0").equals("")*/) {
+
+                sendNotification("New message from " + fromUser, message);
+            } else {
+
+                editor.putInt("hasMessage", 1);
+                editor.putString("message", message);
+                editor.putString("userFrom", fromUser);
+
+                editor.apply();
+
+            }
+
+            Log.d("FROM", fromUser);
+            Log.d("Message", message);
+
 
         }
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
+            Log.d("Title", remoteMessage.getData().toString());
+            //sendNotification(remoteMessage.getData().toString());
+            sendNotification("message from noel", "test");
+
         }
 
-        sendNotification(remoteMessage.getData().toString());
+
+        //  sendNotification(remoteMessage.getData().toString());
         // Also if you intend on generating your own notifications as a result of a received FCM
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
-    private void sendNotification(String messageBody) {
+    private void sendNotification(String title, String message) {
 
         Intent intent = new Intent(this, DashBoard.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -60,8 +80,8 @@ public class NotificationService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_gear)
-                .setContentTitle("FCM Message")
-                .setContentText(messageBody)
+                .setContentTitle(title)
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
@@ -71,4 +91,6 @@ public class NotificationService extends FirebaseMessagingService {
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
+
+
 }

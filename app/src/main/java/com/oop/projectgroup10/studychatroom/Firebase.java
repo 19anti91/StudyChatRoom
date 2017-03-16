@@ -28,13 +28,12 @@ public class Firebase extends FirebaseInstanceIdService {
         SharedPreferences pref = getBaseContext().getSharedPreferences("StudyChatRoom", 0);
         SharedPreferences.Editor edit = pref.edit();
         edit.putString("firebasetoken", refreshedToken);
+        edit.apply();
 
     }
 
     private void sendRegistrationToServer(String token, String userid) {
 
-
-        // TODO: Implement this method to send token to your app server.
     }
 
 }

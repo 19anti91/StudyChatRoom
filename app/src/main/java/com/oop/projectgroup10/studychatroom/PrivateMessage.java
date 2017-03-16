@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class PrivateMessage extends AppCompatActivity {
 
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
+    static boolean isActive = false;
     public ListView usersFound;
     ViewGroup view;
 
@@ -43,17 +45,30 @@ public class PrivateMessage extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        isActive = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isActive = false;
+    }
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_message);
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences.Editor edit = pref.edit();
         ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Private Conversation with " + pref.getString("currentPrivUser", ""));
         actionBar.setDefaultDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Private Messages");
+
         layout = (LinearLayout) findViewById(R.id.privMsgLayout);
         view = (ViewGroup) findViewById(R.id.privMsgLayout);
 
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final SharedPreferences.Editor edit = pref.edit();
+        new MessageAsync(this.getApplicationContext(), this, view, layout).execute("getPrivMsg", String.valueOf(pref.getInt("userid", 0)), pref.getString("currentPrivUser", ""));
 
 
         Timer timer = new Timer();
@@ -65,13 +80,10 @@ public class PrivateMessage extends AppCompatActivity {
                     public void run() {
 
                         if (pref.getInt("hasMessage", 0) == 1) {
-                            View view = LayoutInflater.from(getApplicationContext()).inflate(R.layout.msg_from_them, null);
-                            layout.addView(view);
-                            TextView msgFromMe = (TextView) findViewById(R.id.msgFromThemTxt);
-                            msgFromMe.setId(generateViewId());
-                            msgFromMe.setText(pref.getString("message", "a"));
+
+                            populateReceivedMsg(pref.getString("message", ""), pref.getString("userFrom", ""));
                             Log.e("TEST", pref.getString("message", "a"));
-                            layout.invalidate();
+
                             edit.putInt("hasMessage", 0);
                             edit.apply();
 
@@ -82,22 +94,25 @@ public class PrivateMessage extends AppCompatActivity {
                 });
 
             }
-        }, 0, 1000);
+        }, 0, 500);
 
 
     }
 
 
-    //TODO either use FCM to send and receive messages or create a service that sends requests every 0.2 seconds to the server requesting new messages
     public void sendMessage(View v) {
 
         View view = LayoutInflater.from(this).inflate(R.layout.msg_from_me, null);
-        //  new SendDataAsync(null, null).execute("").execute("getAllUsers", "asdasd", "asdasd");
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String toUsername = pref.getString("currentPrivUser", "");
+
         if (!getMessage().isEmpty()) {
+            new MessageAsync(getApplicationContext(), this, view, layout).execute("privMsg", String.valueOf(pref.getInt("userid", 0)), toUsername, getMessage());
             layout.addView(view);
             TextView msgFromMe = (TextView) findViewById(R.id.msgFromMeTxt);
             msgFromMe.setId(generateViewId());
             msgFromMe.setText(getMessage());
+            ImageView icon = getIcon(pref.getInt("usericon", 0), R.id.messageFromMeIcon);
             layout.invalidate();
             EditText msgToSend = (EditText) findViewById(R.id.msgToSend);
             msgToSend.setText("");
@@ -115,8 +130,75 @@ public class PrivateMessage extends AppCompatActivity {
         }
     }
 
+    //TODO emojis
+/*
+    public String getEmojiByUnicode(int unicode){
+        return new String(Character.toChars(unicode));
+        msgFromMe.setText(getEmojiByUnicode(0x1F60A));
+        http://apps.timwhitlock.info/emoji/tables/unicode
+    }*/
+    public void populateReceivedMsg(String msg, String from) {
+
+
+        View view = LayoutInflater.from(this).inflate(R.layout.msg_from_them, null);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String toUsername = pref.getString("currentPrivUser", "");
+
+        if (!msg.isEmpty() && from.equals(toUsername)) {
+
+            layout.addView(view);
+            TextView msgFromMe = (TextView) findViewById(R.id.msgFromThemTxt);
+            //int privUserIcon = pref.getInt("currentPrivUserIcon",7);
+            ImageView icon = getIcon(pref.getInt("currentPrivUserIcon", 7), R.id.msgFromThemIcon);
+
+            msgFromMe.setId(generateViewId());
+            msgFromMe.setText(msg);
+            layout.invalidate();
+
+            final ScrollView scroll = (ScrollView) findViewById(R.id.scrollPriv);
+            scroll.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                scroll.fullScroll(View.FOCUS_DOWN);
+                            }
+                        }
+
+            );
+
+        }
+
+    }
+
+    public ImageView getIcon(int icon, int id) {
+        ImageView imageView = (ImageView) findViewById(id);
+        switch (icon) {
+            case 0:
+                imageView.setImageResource(R.drawable.ic_femalelight);
+                break;
+            case 1:
+                imageView.setImageResource(R.drawable.ic_femaledark);
+                break;
+            case 2:
+                imageView.setImageResource(R.drawable.ic_femaledarker);
+                break;
+            case 3:
+                imageView.setImageResource(R.drawable.ic_maleredhair);
+                break;
+            case 4:
+                imageView.setImageResource(R.drawable.ic_malelight);
+                break;
+            case 5:
+                imageView.setImageResource(R.drawable.ic_maledarker);
+                break;
+
+        }
+        return imageView;
+    }
+
+
+
     public void recieveMessage(View v) {
-        new MessageAsync(this.getApplicationContext(), this, this.view).execute();
+        new MessageAsync(this.getApplicationContext(), this, this.view, layout).execute();
     }
 
     public String getMessage() {

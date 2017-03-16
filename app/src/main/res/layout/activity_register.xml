@@ -20,7 +20,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="35dp"
         android:fontFamily="casual"
         android:text="Study Chat Room"
         android:textAllCaps="true"
@@ -116,28 +115,39 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/confirmpassword"
-        android:layout_below="@+id/passMatch"
+        android:layout_below="@+id/confirmpassword"
+        android:layout_marginTop="16dp"
         android:text="User Type"
         android:textSize="18sp" />
 
+    <TextView
+        android:id="@+id/userIconR"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/usertypeT"
+        android:layout_below="@+id/usertype"
+        android:layout_marginStart="13dp"
+        android:layout_marginTop="14dp"
+        android:text="Select Avatar"
+        android:textSize="18sp" />
+
+    <Spinner
+        android:id="@+id/userIconSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/userIconR"
+        android:layout_alignEnd="@+id/confirmpassword" />
     <Button
         android:id="@+id/submitRegisterBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/userIconSpinner"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp"
+        android:layout_marginTop="12dp"
         android:background="@color/colorPrimaryDark"
         android:onClick="submitRegistration"
         android:text="Submit" />
 
-    <TextView
-        android:id="@+id/passMatch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/confirmpassword"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="13dp"
-        android:textSize="14sp" />
+
 </RelativeLayout>
 </ScrollView>
