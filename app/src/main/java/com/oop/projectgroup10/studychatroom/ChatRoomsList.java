@@ -6,12 +6,17 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class ChatRoomsList extends AppCompatActivity {
 
@@ -29,10 +34,47 @@ public class ChatRoomsList extends AppCompatActivity {
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = pref.edit();
-
-        new SendDataAsync(this, this).execute("getAllChatRooms");
-
+        editor.putString("currentChatRoom", "");
+        editor.apply();
+        new SendDataAsync(this, this).execute("getAllChatRooms", String.valueOf(pref.getString("userid", "")));
         chatRoomListView = (ListView) findViewById(R.id.chatRoomList);
+
+        String[] chatRoomName = {};
+        String[] chatRoomOwner = {};
+        Integer[] chatRoomMembers = {};
+
+        JSONArray chatRoomList;
+
+        try {
+            chatRoomList = new JSONArray(pref.getString("chatRoomList", ""));
+            chatRoomName = new String[chatRoomList.length()];
+            chatRoomOwner = new String[chatRoomList.length()];
+            chatRoomMembers = new Integer[chatRoomList.length()];
+
+            for (int i = 0; i < chatRoomList.length(); i++) {
+                JSONObject room = (JSONObject) chatRoomList.get(i);
+                chatRoomName[i] = room.getString("");
+                chatRoomOwner[i] = room.getString("");
+                chatRoomMembers[i] = Integer.valueOf(room.getString(""));
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        customListAdapter = new CustomListAdapterChatRooms(this, chatRoomName, chatRoomOwner, chatRoomMembers);
+
+        chatRoomListView.setAdapter(customListAdapter);
+
+        chatRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                String roomName = chatRoomListView.getItemAtPosition(position).toString();
+                Log.d("roomname", roomName);
+
+            }
+        });
+
     }
 
 

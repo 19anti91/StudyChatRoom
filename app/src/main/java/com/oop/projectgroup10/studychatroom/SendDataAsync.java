@@ -136,6 +136,7 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
 
         JSONObject data = null;
         JSONArray userList;
+        JSONArray chatRoomList;
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
         SharedPreferences.Editor editor = pref.edit();
         try {
@@ -152,6 +153,10 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
             } else if (action.equals("getAllUsers")) {
                 userList = returnValues.getJSONArray("data");
                 editor.putString("userList", userList.toString());
+                editor.apply();
+            } else if (action.equals("getAllChatRooms")) {
+                chatRoomList = returnValues.getJSONArray("data");
+                editor.putString("chatRoomList", chatRoomList.toString());
                 editor.apply();
             }
 
