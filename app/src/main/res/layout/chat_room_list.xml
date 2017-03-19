@@ -29,4 +29,12 @@
         android:layout_marginLeft="10dp"
         android:text="TextView"
         android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/chatRoomPassProt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="TextView"
+        android:textSize="8sp" />
 </LinearLayout>
