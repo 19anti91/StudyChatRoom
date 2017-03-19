@@ -90,9 +90,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
 
             } else if (action.equals("joinChatRoom")) {
                 value1 = args[2];
-                value2 = args[3];
+
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
-                data += "&" + URLEncoder.encode("userid", "UTF-8") + "=" + value2;
+
 
             }
 

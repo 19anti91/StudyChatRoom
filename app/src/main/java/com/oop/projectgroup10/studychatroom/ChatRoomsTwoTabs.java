@@ -2,6 +2,7 @@ package com.oop.projectgroup10.studychatroom;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -116,6 +117,13 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem settingsItem = menu.findItem(R.id.action_settings);
+        settingsItem.setVisible(false);
+        return false;
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -145,17 +153,15 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.activity_chat_rooms_list, container, false);
-            //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             final int section = getArguments().getInt(ARG_SECTION_NUMBER);
             CustomListAdapterChatRooms customListAdapter;
             final Activity act = getActivity();
             final ListView chatRoomListView;
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
-            SharedPreferences.Editor editor = pref.edit();
+            final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
+            final SharedPreferences.Editor editor = pref.edit();
             editor.putString("currentChatRoom", "");
             editor.apply();
-            //TODO Send both data at the same time, divide them and show themono each window
+
             new SendDataAsync(this.getActivity(), this.getActivity()).execute("getAllChatRooms", String.valueOf(pref.getInt("userid", 0)));
             chatRoomListView = (ListView) rootView.findViewById(R.id.chatRoomList);
 
@@ -200,7 +206,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
             chatRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, final int position, long l) {
-                    String roomName = chatRoomListView.getItemAtPosition(position).toString();
+                    final String roomName = chatRoomListView.getItemAtPosition(position).toString();
 
 
                     if (section == 1) {
@@ -217,7 +223,12 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
 
                                         if (hashPass(password.getText().toString()).equals(pass[position])) {
                                             Toast.makeText(act, "Password Correct", Toast.LENGTH_SHORT).show();
-                                            //TODO do insert query and go to room
+                                            new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)));
+                                            editor.putString("currentChatRoom", roomName);
+                                            editor.apply();
+                                            Intent goToChatRoom = new Intent(act, ChatRooms.class);
+                                            startActivity(goToChatRoom);
+
                                         } else {
                                             Toast.makeText(act, "Password Incorrect", Toast.LENGTH_SHORT).show();
                                         }
@@ -232,7 +243,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                                 .setIcon(R.drawable.ic_gear)
                                 .show();
                     } else {
-                        //TODO go to room
+
                     }
                 }
             });

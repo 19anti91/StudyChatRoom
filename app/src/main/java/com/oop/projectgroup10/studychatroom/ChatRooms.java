@@ -1,6 +1,8 @@
 package com.oop.projectgroup10.studychatroom;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -42,6 +44,10 @@ public class ChatRooms extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        getSupportActionBar().setTitle(pref.getString("currentChatRoom", ""));
+
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
@@ -53,6 +59,12 @@ public class ChatRooms extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem settingsItem = menu.findItem(R.id.action_settings);
+        settingsItem.setVisible(false);
+        return false;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -107,6 +119,17 @@ public class ChatRooms extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_chat_rooms, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            int section = getArguments().getInt(ARG_SECTION_NUMBER);
+
+            if (section == 1) {
+
+            } else if (section == 2) {
+
+            } else {
+
+            }
+
+
             return rootView;
         }
     }
