@@ -11,9 +11,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -75,10 +75,13 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_rooms_two_tabs);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Chat Rooms");
+
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("Chat Rooms");
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -207,7 +210,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, final int position, long l) {
                     final String roomName = chatRoomListView.getItemAtPosition(position).toString();
-
+//TODO check if password is blank, if so dont prompt and go to room
 
                     if (section == 1) {
                         final EditText password = new EditText(act);
@@ -243,7 +246,10 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                                 .setIcon(R.drawable.ic_gear)
                                 .show();
                     } else {
-
+                        editor.putString("currentChatRoom", roomName);
+                        editor.apply();
+                        Intent goToChatRoom = new Intent(act, ChatRooms.class);
+                        startActivity(goToChatRoom);
                     }
                 }
             });

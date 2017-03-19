@@ -63,7 +63,7 @@ public class PrivateMessage extends AppCompatActivity {
         final SharedPreferences.Editor edit = pref.edit();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Private Conversation with " + pref.getString("currentPrivUser", ""));
-        actionBar.setDefaultDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         layout = (LinearLayout) findViewById(R.id.privMsgLayout);
         view = (ViewGroup) findViewById(R.id.privMsgLayout);

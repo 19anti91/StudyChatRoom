@@ -16,6 +16,7 @@
         android:textColorHint="#CFD8DC" />
 
     <ImageView
+        android:id="@+id/sendMsgBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="5"
