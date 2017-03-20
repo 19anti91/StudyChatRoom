@@ -32,19 +32,22 @@ public class NotificationService extends FirebaseMessagingService {
         if (remoteMessage.getData().size() > 0) {
             String message = remoteMessage.getData().get("message");
             String fromUser = remoteMessage.getData().get("userFrom");
+            String fromGroup = remoteMessage.getData().get("userGroup");
+            String icon = remoteMessage.getData().get("userIcon");
 
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = pref.edit();
-            if (!fromUser.equals(pref.getString("currentPrivUser", "0")) /*|| pref.getString("currentPrivUser","0").equals("")*/) {
-
+            if (!fromUser.equals(pref.getString("currentPrivUser", "0"))) {
                 sendNotification("New message from " + fromUser, message);
+            } else if (!fromGroup.equals(pref.getString("currentChatRoom", ""))) {
+                sendNotification("New message on " + fromGroup + " Chat Room", message);
             } else {
 
                 editor.putInt("hasMessage", 1);
                 editor.putString("message", message);
                 editor.putString("userFrom", fromUser);
-
+                editor.putString("groupUserIcon", icon);
                 editor.apply();
 
             }

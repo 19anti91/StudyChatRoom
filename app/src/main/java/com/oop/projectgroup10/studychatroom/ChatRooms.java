@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -81,63 +80,6 @@ public class ChatRooms extends AppCompatActivity {
         msgFromMe.setText(getEmojiByUnicode(0x1F60A));
         http://apps.timwhitlock.info/emoji/tables/unicode
     }*/
-    public static void populateReceivedMsg(String msg, String from, Activity activity) {
-
-
-        View view = LayoutInflater.from(activity).inflate(R.layout.msg_from_them, null);
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(activity);
-        String toUsername = pref.getString("currentPrivUser", "");
-
-        if (!msg.isEmpty() && from.equals(toUsername)) {
-
-            layout.addView(view);
-            TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
-            //int privUserIcon = pref.getInt("currentPrivUserIcon",7);
-            ImageView icon = getIcon(pref.getInt("currentPrivUserIcon", 7), R.id.msgFromThemIcon, view);
-
-            msgFromMe.setId(generateViewId());
-            msgFromMe.setText(msg);
-            layout.invalidate();
-
-            final ScrollView scroll = (ScrollView) view.findViewById(R.id.scrollPriv);
-            scroll.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                scroll.fullScroll(View.FOCUS_DOWN);
-                            }
-                        }
-
-            );
-
-        }
-
-    }
-
-    public static ImageView getIcon(int icon, int id, View view) {
-        ImageView imageView = (ImageView) view.findViewById(id);
-        switch (icon) {
-            case 0:
-                imageView.setImageResource(R.drawable.ic_femalelight);
-                break;
-            case 1:
-                imageView.setImageResource(R.drawable.ic_femaledark);
-                break;
-            case 2:
-                imageView.setImageResource(R.drawable.ic_femaledarker);
-                break;
-            case 3:
-                imageView.setImageResource(R.drawable.ic_maleredhair);
-                break;
-            case 4:
-                imageView.setImageResource(R.drawable.ic_malelight);
-                break;
-            case 5:
-                imageView.setImageResource(R.drawable.ic_maledarker);
-                break;
-
-        }
-        return imageView;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,47 +136,9 @@ public class ChatRooms extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void sendMessage(View v) {
 
-        View view = LayoutInflater.from(this).inflate(R.layout.msg_from_me, null);
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String toGroup = pref.getString("currentChatRoom", "");
 
-        if (!getMessage().isEmpty()) {
-            new MessageAsync(getApplicationContext(), this, view, layout).execute("groupMsg", String.valueOf(pref.getInt("userid", 0)), toGroup, getMessage());
-            layout.addView(view);
-            TextView msgFromMe = (TextView) findViewById(R.id.msgFromMeTxt);
-            msgFromMe.setId(generateViewId());
-            msgFromMe.setText(getMessage());
-            ImageView icon = getIcon(pref.getInt("usericon", 0), R.id.messageFromMeIcon, view);
-            layout.invalidate();
-            EditText msgToSend = (EditText) findViewById(R.id.msgToSend);
-            msgToSend.setText("");
 
-            final ScrollView scroll = (ScrollView) findViewById(R.id.scrollPriv);
-            scroll.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                scroll.fullScroll(View.FOCUS_DOWN);
-                            }
-                        }
-
-            );
-
-        }
-    }
-
-    public void recieveMessage(View v) {
-        new MessageAsync(this.getApplicationContext(), this, view, layout).execute();
-    }
-
-    public String getMessage() {
-        String msg;
-        EditText msgToSend = (EditText) findViewById(R.id.msgToSend);
-        msg = msgToSend.getText().toString();
-
-        return msg;
-    }
 
     /**
      * A placeholder fragment containing a simple view.
@@ -245,6 +149,7 @@ public class ChatRooms extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        View rootView;
 
         public PlaceholderFragment() {
         }
@@ -261,6 +166,92 @@ public class ChatRooms extends AppCompatActivity {
             return fragment;
         }
 
+        /*
+                public void populateReceivedMsg(String msg, String fromUser, int ico) {
+
+
+                    View view = LayoutInflater.from(act).inflate(R.layout.msg_from_them, null);
+                    // LinearLayout layout = (LinearLayout) view.findViewById(R.id.privMsgLayout);
+                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
+                    String toUsername = pref.getString("currentPrivUser", "");
+                    int privUserIcon = pref.getInt("currentPrivUserIcon", 7);
+
+                    layout.addView(view);
+                    TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
+                    ImageView icon;
+                    if(!(ico == 7)){
+                        icon = getIcon(ico, R.id.msgFromThemIcon);
+                    }else {
+                        icon = getIcon(privUserIcon, R.id.msgFromThemIcon);
+                    }
+                    if(!fromUser.equals("")){
+                        TextView userName = (TextView) view.findViewById(R.id.msgFromGroup);
+                        userName.setText(fromUser);}
+                    msgFromMe.setId(generateViewId());
+                    msgFromMe.setText(msg);
+                    layout.invalidate();
+
+
+                }
+        */
+        public static void populateReceivedMsg(String msg, String from, Activity activity) {
+
+
+            View view = LayoutInflater.from(activity).inflate(R.layout.msg_from_them, null);
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(activity);
+            String toUsername = pref.getString("currentPrivUser", "");
+
+            if (!msg.isEmpty() && from.equals(toUsername)) {
+
+                layout.addView(view);
+                TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
+                //int privUserIcon = pref.getInt("currentPrivUserIcon",7);
+                ImageView icon = getIcon(pref.getInt("currentPrivUserIcon", 7), R.id.msgFromThemIcon, view);
+
+                msgFromMe.setId(generateViewId());
+                msgFromMe.setText(msg);
+                layout.invalidate();
+
+                final ScrollView scroll = (ScrollView) view.findViewById(R.id.scrollPriv);
+                scroll.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    scroll.fullScroll(View.FOCUS_DOWN);
+                                }
+                            }
+
+                );
+
+            }
+
+        }
+
+        public static ImageView getIcon(int icon, int id, View view) {
+            ImageView imageView = (ImageView) view.findViewById(id);
+            switch (icon) {
+                case 0:
+                    imageView.setImageResource(R.drawable.ic_femalelight);
+                    break;
+                case 1:
+                    imageView.setImageResource(R.drawable.ic_femaledark);
+                    break;
+                case 2:
+                    imageView.setImageResource(R.drawable.ic_femaledarker);
+                    break;
+                case 3:
+                    imageView.setImageResource(R.drawable.ic_maleredhair);
+                    break;
+                case 4:
+                    imageView.setImageResource(R.drawable.ic_malelight);
+                    break;
+                case 5:
+                    imageView.setImageResource(R.drawable.ic_maledarker);
+                    break;
+
+            }
+            return imageView;
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -268,7 +259,7 @@ public class ChatRooms extends AppCompatActivity {
             final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             final SharedPreferences.Editor edit = pref.edit();
 
-            final View rootView;// = inflater.inflate(R.layout.fragment_chat_rooms, container, false);
+            // = inflater.inflate(R.layout.fragment_chat_rooms, container, false);
             //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             int section = getArguments().getInt(ARG_SECTION_NUMBER);
@@ -285,7 +276,14 @@ public class ChatRooms extends AppCompatActivity {
 
                 new MessageAsync(getActivity(), getActivity(), view, layout).execute("getGroupMsg", String.valueOf(pref.getInt("userid", 0)), pref.getString("currentChatRoom", ""));
                 ImageView send = (ImageView) rootView.findViewById(R.id.sendMsgBtn);
-                //TODO figure out listener for image
+                send.setClickable(true);
+                send.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sendMessage(v);
+                    }
+                });
+                //TODO populate messages and work with fcmhandler
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -297,7 +295,6 @@ public class ChatRooms extends AppCompatActivity {
                                 if (pref.getInt("hasMessage", 0) == 1) {
 
                                     populateReceivedMsg(pref.getString("message", ""), pref.getString("userFrom", ""), getActivity());
-                                    Log.e("TEST", pref.getString("message", "a"));
 
                                     edit.putInt("hasMessage", 0);
                                     edit.apply();
@@ -320,6 +317,48 @@ public class ChatRooms extends AppCompatActivity {
 
 
             return rootView;
+        }
+
+        public void sendMessage(View v) {
+
+            View view = LayoutInflater.from(getActivity()).inflate(R.layout.msg_from_me, null);
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String toGroup = pref.getString("currentChatRoom", "");
+
+            if (!getMessage().isEmpty()) {
+                new MessageAsync(getActivity(), getActivity(), view, layout).execute("groupMsg", String.valueOf(pref.getInt("userid", 0)), toGroup, getMessage());
+                layout.addView(view);
+                TextView msgFromMe = (TextView) rootView.findViewById(R.id.msgFromMeTxt);
+                msgFromMe.setId(generateViewId());
+                msgFromMe.setText(getMessage());
+                ImageView icon = getIcon(pref.getInt("usericon", 0), R.id.messageFromMeIcon, view);
+                layout.invalidate();
+                EditText msgToSend = (EditText) rootView.findViewById(R.id.msgToSend);
+                msgToSend.setText("");
+
+                final ScrollView scroll = (ScrollView) rootView.findViewById(R.id.scrollPriv);
+                scroll.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    scroll.fullScroll(View.FOCUS_DOWN);
+                                }
+                            }
+
+                );
+
+            }
+        }
+
+        public void recieveMessage(View v) {
+            new MessageAsync(getActivity(), getActivity(), view, layout).execute();
+        }
+
+        public String getMessage() {
+            String msg;
+            EditText msgToSend = (EditText) rootView.findViewById(R.id.msgToSend);
+            msg = msgToSend.getText().toString();
+
+            return msg;
         }
     }
 

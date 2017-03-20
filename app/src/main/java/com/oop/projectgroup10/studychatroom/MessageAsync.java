@@ -138,7 +138,8 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        if (action.equals("getPrivMsg")) {
+
+        if (action.equals("getPrivMsg") || action.equals("getGroupMsg")) {
         processFinish(result);
         }
 
@@ -158,10 +159,16 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
                 JSONObject message = (JSONObject) messages.get(i);
                 String from = message.getString("from");
                 String msg = message.getString("message");
+                String fromUser = "";
+                int icon = 7;
+                if (action.equals("getGroupMsg")) {
+                    fromUser = message.getString("fromusername");
+                    icon = Integer.valueOf(message.getString("fromusericon"));
+                }
                 if (from.equals(String.valueOf(pref.getInt("userid", 0)))) {
                     populateMsgFromMe(msg);
                 } else {
-                    populateReceivedMsg(msg);
+                    populateReceivedMsg(msg, fromUser, icon);
                 }
             }
 
@@ -183,13 +190,14 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
         msgFromMe.setId(generateViewId());
         msgFromMe.setText(msg);
         ImageView icon = getIcon(pref.getInt("usericon", 7), R.id.messageFromMeIcon);
+
             layout.invalidate();
 
 
     }
 
 
-    public void populateReceivedMsg(String msg) {
+    public void populateReceivedMsg(String msg, String fromUser, int ico) {
 
 
         View view = LayoutInflater.from(act).inflate(R.layout.msg_from_them, null);
@@ -200,8 +208,16 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
         layout.addView(view);
         TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
-        ImageView icon = getIcon(privUserIcon, R.id.msgFromThemIcon);
-        Log.d("ICON", String.valueOf(icon));
+        ImageView icon;
+        if (!(ico == 7)) {
+            icon = getIcon(ico, R.id.msgFromThemIcon);
+        } else {
+            icon = getIcon(privUserIcon, R.id.msgFromThemIcon);
+        }
+        if (!fromUser.equals("")) {
+            TextView userName = (TextView) view.findViewById(R.id.msgFromGroup);
+            userName.setText(fromUser);
+        }
         msgFromMe.setId(generateViewId());
         msgFromMe.setText(msg);
         layout.invalidate();
