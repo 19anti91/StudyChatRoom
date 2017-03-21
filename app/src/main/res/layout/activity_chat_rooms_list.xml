@@ -7,6 +7,8 @@
 
     <ListView
         android:id="@+id/chatRoomList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="344dp"
+        android:layout_height="520dp"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp" />
 </android.support.constraint.ConstraintLayout>

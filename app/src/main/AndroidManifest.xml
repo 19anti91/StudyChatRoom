@@ -63,15 +63,7 @@
             android:configChanges="orientation"
             android:parentActivityName=".DashBoard"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".ChatRooms"
-            android:label="@string/title_activity_chat_rooms"
-            android:parentActivityName=".DashBoard"
-            android:theme="@style/studyChat.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
-        </activity>
+
         <activity
             android:name=".PrivateMessage"
             android:screenOrientation="portrait" />
@@ -87,9 +79,25 @@
                 android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
         </activity>
         <activity
-            android:name=".ChatRoomsList"
+            android:name=".ChatRoomsTwoTabs"
+            android:label="@string/title_activity_chat_rooms_two_tabs"
+            android:parentActivityName=".DashBoard"
             android:screenOrientation="portrait"
-            android:theme="@style/studyChat" />
+            android:theme="@style/studyChat">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oop.projectgroup10.studychatroom.DashBoard" />
+        </activity>
+        <activity
+            android:name=".ChatRooms"
+            android:label="@string/title_activity_chat_rooms"
+            android:parentActivityName=".DashBoard"
+            android:screenOrientation="portrait"
+            android:theme="@style/studyChat">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.oop.projectgroup10.studychatroom.ChatRoomsTwoTabs" />
+        </activity>
     </application>
 
 </manifest>

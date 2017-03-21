@@ -24,7 +24,7 @@
 
         <ImageView
             android:id="@+id/messageFromMeIcon"
-            android:layout_width="50dp"
+            android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_marginTop="7dp"
             android:layout_weight="0.72"

@@ -85,7 +85,7 @@ public class CreateRoom extends AppCompatActivity {
         if (!getRoomName().isEmpty() && ((getIsPassProt() && !getPassword().isEmpty() && passwordOK) || !getIsPassProt())) {
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             new SendDataAsync(this.getApplicationContext(), this).execute("createRoom", String.valueOf(pref.getInt("userid", 0)), getRoomName(), getPassword(), isPrivate());
-            finish();
+
         } else {
             Toast.makeText(this, "Please check the room name and password", Toast.LENGTH_LONG).show();
         }

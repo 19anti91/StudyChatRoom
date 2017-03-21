@@ -1,10 +1,12 @@
 package com.oop.projectgroup10.studychatroom;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,12 +38,13 @@ public class ChatRoomsList extends AppCompatActivity {
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("currentChatRoom", "");
         editor.apply();
-        new SendDataAsync(this, this).execute("getAllChatRooms", String.valueOf(pref.getString("userid", "")));
+        new SendDataAsync(this, this).execute("getAllChatRooms", String.valueOf(pref.getInt("userid", 0)));
         chatRoomListView = (ListView) findViewById(R.id.chatRoomList);
 
         String[] chatRoomName = {};
         String[] chatRoomOwner = {};
         Integer[] chatRoomMembers = {};
+        Integer[] chatRoomOwnerId = {};
 
         JSONArray chatRoomList;
 
@@ -50,12 +53,14 @@ public class ChatRoomsList extends AppCompatActivity {
             chatRoomName = new String[chatRoomList.length()];
             chatRoomOwner = new String[chatRoomList.length()];
             chatRoomMembers = new Integer[chatRoomList.length()];
+            chatRoomOwnerId = new Integer[chatRoomList.length()];
 
             for (int i = 0; i < chatRoomList.length(); i++) {
                 JSONObject room = (JSONObject) chatRoomList.get(i);
-                chatRoomName[i] = room.getString("");
-                chatRoomOwner[i] = room.getString("");
-                chatRoomMembers[i] = Integer.valueOf(room.getString(""));
+                chatRoomName[i] = room.getString("chatroomname");
+                chatRoomOwner[i] = room.getString("chatroomownerusername");
+                chatRoomOwnerId[i] = Integer.valueOf(room.getString("chatroomownerid"));
+                chatRoomMembers[i] = Integer.valueOf(room.getString("chatroommembers"));
 
             }
         } catch (Exception e) {
@@ -71,6 +76,24 @@ public class ChatRoomsList extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 String roomName = chatRoomListView.getItemAtPosition(position).toString();
                 Log.d("roomname", roomName);
+                //TODO check if user is already on that room, if not do alert and ask
+                new AlertDialog.Builder(act)
+                        .setTitle("Join Chat Room?")
+                        .setMessage("Do you want to join this Chat Room?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        })
+                        .setIcon(R.drawable.ic_gear)
+                        .show();
 
             }
         });
@@ -104,8 +127,8 @@ public class ChatRoomsList extends AppCompatActivity {
             TextView roomMembers = (TextView) rowView.findViewById(R.id.chatRoomMembersList);
 
             roomName.setText(chatRoomName[position]);
-            roomOwner.setText(chatRoomOwner[position]);
-            roomMembers.setText(chatRoomMembers[position]);
+            roomOwner.setText("Owner: " + chatRoomOwner[position]);
+            roomMembers.setText("Members: " + String.valueOf(chatRoomMembers[position]));
 
             return rowView;
 

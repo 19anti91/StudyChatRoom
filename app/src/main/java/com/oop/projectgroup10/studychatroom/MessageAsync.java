@@ -79,6 +79,19 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("userId", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
                 data += "&" + URLEncoder.encode("otherUserName", "UTF-8") + "=" + URLEncoder.encode(receiverUsername, "UTF-8");
 
+            } else if (action.equals("groupMsg")) {
+                message = args[3];
+                link = "http://www.passtrunk.com/OOPAPI/fcmhandler.php";
+                data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
+                data += "&" + URLEncoder.encode("userId", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
+                data += "&" + URLEncoder.encode("groupName", "UTF-8") + "=" + URLEncoder.encode(receiverUsername, "UTF-8");
+                data += "&" + URLEncoder.encode("message", "UTF-8") + "=" + URLEncoder.encode(message, "UTF-8");
+
+            } else if (action.equals("getGroupMsg")) {
+                link = "http://www.passtrunk.com/OOPAPI/messages.php";
+                data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
+                data += "&" + URLEncoder.encode("userId", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
+                data += "&" + URLEncoder.encode("groupName", "UTF-8") + "=" + URLEncoder.encode(receiverUsername, "UTF-8");
             } else {
                 link = "http://www.passtrunk.com/OOPAPI/fcmhandler.php";
                 message = args[3];
@@ -125,7 +138,8 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        if (action.equals("getPrivMsg")) {
+
+        if (action.equals("getPrivMsg") || action.equals("getGroupMsg")) {
         processFinish(result);
         }
 
@@ -145,10 +159,16 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
                 JSONObject message = (JSONObject) messages.get(i);
                 String from = message.getString("from");
                 String msg = message.getString("message");
+                String fromUser = "";
+                int icon = 7;
+                if (action.equals("getGroupMsg")) {
+                    fromUser = message.getString("fromusername");
+                    icon = Integer.valueOf(message.getString("fromusericon"));
+                }
                 if (from.equals(String.valueOf(pref.getInt("userid", 0)))) {
                     populateMsgFromMe(msg);
                 } else {
-                    populateReceivedMsg(msg);
+                    populateReceivedMsg(msg, fromUser, icon);
                 }
             }
 
@@ -170,13 +190,14 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
         msgFromMe.setId(generateViewId());
         msgFromMe.setText(msg);
         ImageView icon = getIcon(pref.getInt("usericon", 7), R.id.messageFromMeIcon);
+
             layout.invalidate();
 
 
     }
 
 
-    public void populateReceivedMsg(String msg) {
+    public void populateReceivedMsg(String msg, String fromUser, int ico) {
 
 
         View view = LayoutInflater.from(act).inflate(R.layout.msg_from_them, null);
@@ -187,8 +208,17 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
         layout.addView(view);
         TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
-        ImageView icon = getIcon(privUserIcon, R.id.msgFromThemIcon);
-        Log.d("ICON", String.valueOf(icon));
+        ImageView icon;
+        if (!(ico == 7)) {
+            icon = getIcon(ico, R.id.msgFromThemIcon);
+        } else {
+            icon = getIcon(privUserIcon, R.id.msgFromThemIcon);
+        }
+        if (!fromUser.equals("")) {
+            TextView userName = (TextView) view.findViewById(R.id.msgFromGroup);
+            userName.setId(generateViewId());
+            userName.setText(fromUser);
+        }
         msgFromMe.setId(generateViewId());
         msgFromMe.setText(msg);
         layout.invalidate();

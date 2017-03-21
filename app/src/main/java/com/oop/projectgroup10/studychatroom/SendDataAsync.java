@@ -88,6 +88,12 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("roomPassword", "UTF-8") + "=" + encPass.toString();
                 data += "&" + URLEncoder.encode("isPrivate", "UTF-8") + "=" + value3;
 
+            } else if (action.equals("joinChatRoom")) {
+                value1 = args[2];
+
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+
+
             }
 
 
@@ -136,7 +142,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
 
         JSONObject data = null;
         JSONArray userList;
-        JSONArray chatRoomList;
+        JSONArray myChatRoomList;
+        JSONArray allChatRoomList;
+        JSONObject allRooms;
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
         SharedPreferences.Editor editor = pref.edit();
         try {
@@ -149,14 +157,20 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 data = returnValues.getJSONObject("data");
                 if (status == 0) {
                     Toast.makeText(act, "Room Created Successfully", Toast.LENGTH_LONG).show();
+                    act.finish();
+                } else if (status == 1) {
+                    Toast.makeText(act, "The Room name is taken", Toast.LENGTH_LONG).show();
                 }
             } else if (action.equals("getAllUsers")) {
                 userList = returnValues.getJSONArray("data");
                 editor.putString("userList", userList.toString());
                 editor.apply();
             } else if (action.equals("getAllChatRooms")) {
-                chatRoomList = returnValues.getJSONArray("data");
-                editor.putString("chatRoomList", chatRoomList.toString());
+                allRooms = new JSONObject(returnValues.getString("data"));
+                myChatRoomList = allRooms.getJSONArray("myChatRooms");
+                allChatRoomList = allRooms.getJSONArray("allChatRooms");
+                editor.putString("myChatRoomList", myChatRoomList.toString());
+                editor.putString("allChatRoomList", allChatRoomList.toString());
                 editor.apply();
             }
 

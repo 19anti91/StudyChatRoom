@@ -26,6 +26,7 @@ public class DashBoard extends AppCompatActivity
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         new SendDataAsync(getApplicationContext(), this).execute("getAllUsers", String.valueOf(pref.getInt("userid", 0)));
+        new SendDataAsync(getApplicationContext(), this).execute("getAllChatRooms", String.valueOf(pref.getInt("userid", 0)));
 
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("currentPrivUser", "");
@@ -106,8 +107,8 @@ public class DashBoard extends AppCompatActivity
         } else if (id == R.id.logout) {
             clearPref();
         } else if (id == R.id.chatRoom) {
-            Intent goToChatRoom = new Intent(this, ChatRooms.class);
-            startActivity(goToChatRoom);
+            Intent goToChatRoomList = new Intent(this, ChatRoomsTwoTabs.class);
+            startActivity(goToChatRoomList);
 
 
         } else if (id == R.id.privateMessageRoom) {
