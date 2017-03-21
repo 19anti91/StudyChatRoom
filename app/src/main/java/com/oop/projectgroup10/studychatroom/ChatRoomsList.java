@@ -26,6 +26,8 @@ public class ChatRoomsList extends AppCompatActivity {
     public Activity act = this;
     public ListView chatRoomListView;
 
+    //TODO fix having to go to dashboard to refresh listings
+    //TODO fix navigation
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
