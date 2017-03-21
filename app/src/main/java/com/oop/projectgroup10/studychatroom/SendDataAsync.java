@@ -94,6 +94,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
 
 
+            } else if (action.equals("getAllUsersFromChatRoom")) {
+                value1 = args[2];
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
             }
 
 
@@ -145,6 +148,7 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
         JSONArray myChatRoomList;
         JSONArray allChatRoomList;
         JSONObject allRooms;
+        JSONArray allUsersFromRoom;
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
         SharedPreferences.Editor editor = pref.edit();
         try {
@@ -172,6 +176,11 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 editor.putString("myChatRoomList", myChatRoomList.toString());
                 editor.putString("allChatRoomList", allChatRoomList.toString());
                 editor.apply();
+            } else if (action.equals("getAllUsersFromChatRoom")) {
+                allUsersFromRoom = new JSONArray(returnValues.getString("data"));
+                editor.putString("usersFromChatRoom", allUsersFromRoom.toString());
+                editor.apply();
+
             }
 
 

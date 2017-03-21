@@ -202,6 +202,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
             }
 
 
+
             customListAdapter = new CustomListAdapterChatRooms(act, chatRoomName, chatRoomOwner, chatRoomMembers, passwords);
 
             chatRoomListView.setAdapter(customListAdapter);
@@ -210,44 +211,57 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, final int position, long l) {
                     final String roomName = chatRoomListView.getItemAtPosition(position).toString();
-//TODO check if password is blank, if so dont prompt and go to room
 
                     if (section == 1) {
                         final EditText password = new EditText(act);
                         password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-                        new AlertDialog.Builder(act)
-                                .setTitle("Join Chat Room?")
-                                .setMessage("Do you want to join this Chat Room?")
-                                .setView(password)
-                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                        if (hashPass("").equals(pass[position])) {
+                            new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
+                            editor.putString("currentChatRoom", roomName);
+                            editor.apply();
+                            new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
 
-                                        if (hashPass(password.getText().toString()).equals(pass[position])) {
-                                            Toast.makeText(act, "Password Correct", Toast.LENGTH_SHORT).show();
-                                            new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)));
-                                            editor.putString("currentChatRoom", roomName);
-                                            editor.apply();
-                                            Intent goToChatRoom = new Intent(act, ChatRooms.class);
-                                            startActivity(goToChatRoom);
+                            Intent goToChatRoom = new Intent(act, ChatRooms.class);
+                            startActivity(goToChatRoom);
+                        } else {
+                            new AlertDialog.Builder(act)
+                                    .setTitle("Join Chat Room?")
+                                    .setMessage("This room is password protected. Please type in password")
+                                    .setView(password)
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                                        } else {
-                                            Toast.makeText(act, "Password Incorrect", Toast.LENGTH_SHORT).show();
+                                            if (hashPass(password.getText().toString()).equals(pass[position])) {
+                                                Toast.makeText(act, "Password Correct", Toast.LENGTH_SHORT).show();
+                                                new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
+                                                editor.putString("currentChatRoom", roomName);
+                                                editor.apply();
+                                                new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
+
+                                                Intent goToChatRoom = new Intent(act, ChatRooms.class);
+                                                startActivity(goToChatRoom);
+
+                                            } else {
+                                                Toast.makeText(act, "Password Incorrect", Toast.LENGTH_SHORT).show();
+                                            }
                                         }
-                                    }
-                                })
-                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
+                                    })
+                                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
 
-                                    }
-                                })
-                                .setIcon(R.drawable.ic_gear)
-                                .show();
+                                        }
+                                    })
+                                    .setIcon(R.drawable.ic_gear)
+                                    .show();
+                        }
+
                     } else {
                         editor.putString("currentChatRoom", roomName);
                         editor.apply();
+                        new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
                         Intent goToChatRoom = new Intent(act, ChatRooms.class);
                         startActivity(goToChatRoom);
                     }

@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,12 +18,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -87,13 +90,12 @@ public class ChatRooms extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_rooms);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Chat Rooms");
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(pref.getString("currentChatRoom", ""));
 
 
@@ -239,9 +241,52 @@ public class ChatRooms extends AppCompatActivity {
             //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
             int section = getArguments().getInt(ARG_SECTION_NUMBER);
+            ListView listView;
+            CustomListAdapter adapter;
             //Members
             if (section == 1) {
-                rootView = inflater.inflate(R.layout.activity_private_message, container, false);
+                rootView = inflater.inflate(R.layout.activity_private_message_user_list, container, false);
+                new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), pref.getString("currentChatRoom", ""));
+                listView = (ListView) rootView.findViewById(R.id.userList);
+
+
+                Integer[] userIcon = {};
+                String[] userlist = {};
+
+                JSONArray userList;
+                try {
+                    userList = new JSONArray(pref.getString("usersFromChatRoom", ""));
+                    userlist = new String[userList.length()];
+                    userIcon = new Integer[userList.length()];
+                    for (int i = 0; i < userList.length(); i++) {
+                        JSONObject user = (JSONObject) userList.get(i);
+                        userlist[i] = user.getString("username");
+                        userIcon[i] = Integer.valueOf(user.getString("usericon"));
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                adapter = new CustomListAdapter(getActivity(), userlist, userIcon);
+                final Integer[] icon = userIcon;
+                listView.setAdapter(adapter);
+                /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                        String username = listView.getItemAtPosition(position).toString();
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putString("currentPrivUser", username);
+                        editor.putInt("currentPrivUserIcon", icon[position]);
+
+                        editor.apply();
+
+                        Intent goToPrivMsgRoom = new Intent(getActivity(), PrivateMessage.class);
+                        startActivity(goToPrivMsgRoom);
+                    }
+                });*/
 
 
             } else if (section == 2) {
@@ -295,6 +340,7 @@ public class ChatRooms extends AppCompatActivity {
             return rootView;
         }
 
+        //end
         public void sendMessage(View v) {
 
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.msg_from_me, null);
@@ -335,6 +381,58 @@ public class ChatRooms extends AppCompatActivity {
             msg = msgToSend.getText().toString();
 
             return msg;
+        }
+
+        //Beginning of class custom list adapter
+        public class CustomListAdapter extends ArrayAdapter<String> {
+
+            private final Activity context;
+            private final String[] itemname;
+            private final Integer[] imgid;
+
+            public CustomListAdapter(Activity context, String[] itemname, Integer[] imgid) {
+                super(context, R.layout.user_list, itemname);
+
+                this.context = context;
+                this.itemname = itemname;
+                this.imgid = imgid;
+            }
+
+            public View getView(int position, View view, ViewGroup parent) {
+                LayoutInflater inflater = context.getLayoutInflater();
+                View rowView = inflater.inflate(R.layout.user_list, null, true);
+
+                TextView txtTitle = (TextView) rowView.findViewById(R.id.userListText);
+                ImageView imageView = (ImageView) rowView.findViewById(R.id.userListIcon);
+
+
+                txtTitle.setText(itemname[position]);
+                switch (imgid[position]) {
+                    case 0:
+                        imageView.setImageResource(R.drawable.ic_femalelight);
+                        break;
+                    case 1:
+                        imageView.setImageResource(R.drawable.ic_femaledark);
+                        break;
+                    case 2:
+                        imageView.setImageResource(R.drawable.ic_femaledarker);
+                        break;
+                    case 3:
+                        imageView.setImageResource(R.drawable.ic_maleredhair);
+                        break;
+                    case 4:
+                        imageView.setImageResource(R.drawable.ic_malelight);
+                        break;
+                    case 5:
+                        imageView.setImageResource(R.drawable.ic_maledarker);
+                        break;
+
+                }
+
+
+                return rowView;
+
+            }
         }
     }
 
