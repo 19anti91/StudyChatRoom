@@ -81,7 +81,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
 
             } else if (action.equals("groupMsg")) {
                 message = args[3];
-                link = "http://www.passtrunk.com/OOPAPI/messages.php";
+                link = "http://www.passtrunk.com/OOPAPI/fcmhandler.php";
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("userId", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
                 data += "&" + URLEncoder.encode("groupName", "UTF-8") + "=" + URLEncoder.encode(receiverUsername, "UTF-8");
@@ -216,6 +216,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
         }
         if (!fromUser.equals("")) {
             TextView userName = (TextView) view.findViewById(R.id.msgFromGroup);
+            userName.setId(generateViewId());
             userName.setText(fromUser);
         }
         msgFromMe.setId(generateViewId());

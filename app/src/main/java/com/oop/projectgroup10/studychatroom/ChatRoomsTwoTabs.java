@@ -75,7 +75,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_rooms_two_tabs);
 
-
+//TODO Finalize password and room join
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         ActionBar actionBar = getSupportActionBar();

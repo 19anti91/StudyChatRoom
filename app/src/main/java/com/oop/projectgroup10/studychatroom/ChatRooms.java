@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -166,53 +167,28 @@ public class ChatRooms extends AppCompatActivity {
             return fragment;
         }
 
-        /*
-                public void populateReceivedMsg(String msg, String fromUser, int ico) {
 
-
-                    View view = LayoutInflater.from(act).inflate(R.layout.msg_from_them, null);
-                    // LinearLayout layout = (LinearLayout) view.findViewById(R.id.privMsgLayout);
-                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
-                    String toUsername = pref.getString("currentPrivUser", "");
-                    int privUserIcon = pref.getInt("currentPrivUserIcon", 7);
-
-                    layout.addView(view);
-                    TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
-                    ImageView icon;
-                    if(!(ico == 7)){
-                        icon = getIcon(ico, R.id.msgFromThemIcon);
-                    }else {
-                        icon = getIcon(privUserIcon, R.id.msgFromThemIcon);
-                    }
-                    if(!fromUser.equals("")){
-                        TextView userName = (TextView) view.findViewById(R.id.msgFromGroup);
-                        userName.setText(fromUser);}
-                    msgFromMe.setId(generateViewId());
-                    msgFromMe.setText(msg);
-                    layout.invalidate();
-
-
-                }
-        */
-        public static void populateReceivedMsg(String msg, String from, Activity activity) {
+        public static void populateReceivedMsg(String msg, String from, Activity activity, int ico) {
 
 
             View view = LayoutInflater.from(activity).inflate(R.layout.msg_from_them, null);
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(activity);
-            String toUsername = pref.getString("currentPrivUser", "");
+            String toGroup = pref.getString("userGroup", "");
 
-            if (!msg.isEmpty() && from.equals(toUsername)) {
+            if (!msg.isEmpty() && from.equals(toGroup)) {
 
                 layout.addView(view);
                 TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
-                //int privUserIcon = pref.getInt("currentPrivUserIcon",7);
-                ImageView icon = getIcon(pref.getInt("currentPrivUserIcon", 7), R.id.msgFromThemIcon, view);
+                TextView userName = (TextView) view.findViewById(R.id.msgFromGroup);
+                userName.setId(generateViewId());
+                userName.setText(pref.getString("userFrom", ""));
+                ImageView icon = getIcon(ico, R.id.msgFromThemIcon, view);
 
                 msgFromMe.setId(generateViewId());
                 msgFromMe.setText(msg);
                 layout.invalidate();
-
-                final ScrollView scroll = (ScrollView) view.findViewById(R.id.scrollPriv);
+/*
+                final ScrollView scroll = (ScrollView) lay.findViewById(R.id.scrollPriv);
                 scroll.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -220,7 +196,7 @@ public class ChatRooms extends AppCompatActivity {
                                 }
                             }
 
-                );
+                );*/
 
             }
 
@@ -283,7 +259,7 @@ public class ChatRooms extends AppCompatActivity {
                         sendMessage(v);
                     }
                 });
-                //TODO populate messages and work with fcmhandler
+                //TODO check why dif pictures
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -293,8 +269,8 @@ public class ChatRooms extends AppCompatActivity {
                             public void run() {
 
                                 if (pref.getInt("hasMessage", 0) == 1) {
-
-                                    populateReceivedMsg(pref.getString("message", ""), pref.getString("userFrom", ""), getActivity());
+                                    Log.d("MESSAGE", pref.getString("message", ""));
+                                    populateReceivedMsg(pref.getString("message", ""), pref.getString("userGroup", ""), getActivity(), Integer.valueOf(pref.getString("groupUserIcon", "")));
 
                                     edit.putInt("hasMessage", 0);
                                     edit.apply();
