@@ -32,7 +32,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
         this.context = context;
         this.act = act;
     }
-
+    String value1 = "";
+    String value2 = "";
+    String value3 = "";
     @Override
     protected String doInBackground(String... args) {
 
@@ -40,9 +42,7 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
         String userId = args[1];
         String token = "";
         //These values are used for generic reasons
-        String value1 = "";
-        String value2 = "";
-        String value3 = "";
+
 
         URL url;
         OutputStream outputPost;
@@ -94,6 +94,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
 
 
+            } else if (action.equals("getAllUsersFromChatRoom")) {
+                value1 = args[2];
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
             }
 
 
@@ -145,6 +148,7 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
         JSONArray myChatRoomList;
         JSONArray allChatRoomList;
         JSONObject allRooms;
+        JSONArray allUsersFromRoom;
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
         SharedPreferences.Editor editor = pref.edit();
         try {
@@ -172,6 +176,12 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 editor.putString("myChatRoomList", myChatRoomList.toString());
                 editor.putString("allChatRoomList", allChatRoomList.toString());
                 editor.apply();
+            } else if (action.equals("getAllUsersFromChatRoom")) {
+
+                allUsersFromRoom = new JSONArray(returnValues.getString("data"));
+                editor.putString("usersFrom"+value1, allUsersFromRoom.toString());
+                editor.apply();
+
             }
 
 

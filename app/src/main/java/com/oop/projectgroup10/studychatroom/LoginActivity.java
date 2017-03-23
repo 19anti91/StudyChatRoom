@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-//TODO Reset Password
+//TODO Reset Password using notification with intent to a new activity to input password
     }
 
     public void onBackPressed() {
