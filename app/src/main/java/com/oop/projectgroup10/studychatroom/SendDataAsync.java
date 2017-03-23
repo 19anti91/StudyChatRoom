@@ -32,7 +32,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
         this.context = context;
         this.act = act;
     }
-
+    String value1 = "";
+    String value2 = "";
+    String value3 = "";
     @Override
     protected String doInBackground(String... args) {
 
@@ -40,9 +42,7 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
         String userId = args[1];
         String token = "";
         //These values are used for generic reasons
-        String value1 = "";
-        String value2 = "";
-        String value3 = "";
+
 
         URL url;
         OutputStream outputPost;
@@ -177,8 +177,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 editor.putString("allChatRoomList", allChatRoomList.toString());
                 editor.apply();
             } else if (action.equals("getAllUsersFromChatRoom")) {
+
                 allUsersFromRoom = new JSONArray(returnValues.getString("data"));
-                editor.putString("usersFromChatRoom", allUsersFromRoom.toString());
+                editor.putString("usersFrom"+value1, allUsersFromRoom.toString());
                 editor.apply();
 
             }

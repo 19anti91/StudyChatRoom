@@ -76,7 +76,7 @@ public class ChatRoomsList extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 String roomName = chatRoomListView.getItemAtPosition(position).toString();
                 Log.d("roomname", roomName);
-                //TODO check if user is already on that room, if not do alert and ask
+
                 new AlertDialog.Builder(act)
                         .setTitle("Join Chat Room?")
                         .setMessage("Do you want to join this Chat Room?")

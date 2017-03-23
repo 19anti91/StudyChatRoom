@@ -255,7 +255,7 @@ public class ChatRooms extends AppCompatActivity {
 
                 JSONArray userList;
                 try {
-                    userList = new JSONArray(pref.getString("usersFromChatRoom", ""));
+                    userList = new JSONArray(pref.getString("usersFrom"+pref.getString("currentChatRoom",""), ""));
                     userlist = new String[userList.length()];
                     userIcon = new Integer[userList.length()];
                     for (int i = 0; i < userList.length(); i++) {
@@ -333,7 +333,9 @@ public class ChatRooms extends AppCompatActivity {
 
             } else {
                 rootView = inflater.inflate(R.layout.activity_private_message, container, false);
-
+//delete room, ban people, change room name, create, change password, remove password, invite, make private, make public
+         //regular user leave room
+                //add warnings
             }
 
 

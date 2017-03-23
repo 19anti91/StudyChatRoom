@@ -15,6 +15,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,7 +44,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
+//TODO try to implement Search here and on user list
     /**
      * The {@link ViewPager} that will host the section contents.
      */
@@ -75,7 +76,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_rooms_two_tabs);
 
-//TODO Finalize password and room join
+
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         ActionBar actionBar = getSupportActionBar();
@@ -201,6 +202,10 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                 e.printStackTrace();
             }
 
+            for(int i  = 0; i < chatRoomName.length; i++){
+                new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), chatRoomName[i]);
+
+            }
 
 
             customListAdapter = new CustomListAdapterChatRooms(act, chatRoomName, chatRoomOwner, chatRoomMembers, passwords);
@@ -220,11 +225,18 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                             new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
                             editor.putString("currentChatRoom", roomName);
                             editor.apply();
-                            new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
+                            //new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
 
                             Intent goToChatRoom = new Intent(act, ChatRooms.class);
                             startActivity(goToChatRoom);
-                        } else {
+                        } else if(pref.getString("usersFrom"+roomName,"").contains(pref.getString("username",""))){
+                            editor.putString("currentChatRoom", roomName);
+                            editor.apply();
+                            new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
+                            Intent goToChatRoom = new Intent(act, ChatRooms.class);
+                            startActivity(goToChatRoom);
+                        }else{
+
                             new AlertDialog.Builder(act)
                                     .setTitle("Join Chat Room?")
                                     .setMessage("This room is password protected. Please type in password")
