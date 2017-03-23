@@ -1,6 +1,7 @@
 package com.oop.projectgroup10.studychatroom;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +12,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,11 +23,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -332,7 +338,101 @@ public class ChatRooms extends AppCompatActivity {
 
 
             } else {
-                rootView = inflater.inflate(R.layout.activity_private_message, container, false);
+                rootView = inflater.inflate(R.layout.manage_room, container, false);
+
+                final TextView roomName = (TextView) rootView.findViewById(R.id.roomNameMan);
+                Switch makeRoomPriv = (Switch) rootView.findViewById(R.id.makePrivMan);
+                Switch passProt = (Switch) rootView.findViewById(R.id.passwordProtectedSwitch);
+                TextView changePass = (TextView) rootView.findViewById(R.id.changePasswordMan);
+                TextView inviteUser = (TextView) rootView.findViewById(R.id.inviteUsersMan);
+                TextView banUser = (TextView) rootView.findViewById(R.id.banUsersMan);
+                TextView deleteRoom = (TextView) rootView.findViewById(R.id.deleteRoomMan);
+                TextView leaveRoom = (TextView) rootView.findViewById(R.id.leaveRoomMan);
+
+
+                roomName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final EditText name = new EditText(getActivity());
+                        name.setText(pref.getString("currentChatRoom",""));
+
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Change Room Name")
+                                .setMessage("Please choose the new name")
+                                .setView(name)
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                        new SendDataAsync(getActivity(),getActivity()).execute("updateChatRoomName",pref.getString("userid",""), pref.getString("currentChatRoom",""),name.getText().toString());
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
+                    }
+                });
+
+                makeRoomPriv.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    }
+                });
+
+                passProt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    }
+                });
+
+                changePass.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                inviteUser.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                banUser.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+
+                deleteRoom.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+
+                leaveRoom.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+
+
+
+
+
+                //if regular user only show leave room
+                //if admin or room owner show all except leave room
+
+
 //delete room, ban people, change room name, create, change password, remove password, invite, make private, make public
          //regular user leave room
                 //add warnings

@@ -236,7 +236,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                             Intent goToChatRoom = new Intent(act, ChatRooms.class);
                             startActivity(goToChatRoom);
                         }else{
-
+//TODO if admin no need to join room or prompt for password, admin can also see all rooms
                             new AlertDialog.Builder(act)
                                     .setTitle("Join Chat Room?")
                                     .setMessage("This room is password protected. Please type in password")

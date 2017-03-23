@@ -97,6 +97,11 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
             } else if (action.equals("getAllUsersFromChatRoom")) {
                 value1 = args[2];
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+            } else if(action.equals("updateChatRoomName")){
+                value1 = args[2];
+                value2 = args[3];
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+                data += "&" + URLEncoder.encode("newRoomName", "UTF-8") + "=" + value2;
             }
 
 
