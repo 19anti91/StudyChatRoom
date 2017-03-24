@@ -173,6 +173,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
             String[] chatRoomOwner = {};
             Integer[] chatRoomMembers = {};
             Integer[] chatRoomOwnerId = {};
+           Integer[] isRoomPriv = {};
             String[] passwords = {};
             JSONArray chatRoomList;
 
@@ -187,6 +188,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                 chatRoomOwner = new String[chatRoomList.length()];
                 chatRoomMembers = new Integer[chatRoomList.length()];
                 chatRoomOwnerId = new Integer[chatRoomList.length()];
+                isRoomPriv = new Integer[chatRoomList.length()];
                 passwords = new String[chatRoomList.length()];
 
                 for (int i = 0; i < chatRoomList.length(); i++) {
@@ -195,6 +197,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                     chatRoomOwner[i] = room.getString("chatroomownerusername");
                     chatRoomOwnerId[i] = Integer.valueOf(room.getString("chatroomownerid"));
                     chatRoomMembers[i] = Integer.valueOf(room.getString("chatroommembers"));
+                    isRoomPriv[i] = Integer.valueOf(room.getString("chatispriv"));
                     passwords[i] = room.getString("chatroompass");
 
                 }
@@ -211,7 +214,9 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
             customListAdapter = new CustomListAdapterChatRooms(act, chatRoomName, chatRoomOwner, chatRoomMembers, passwords);
 
             chatRoomListView.setAdapter(customListAdapter);
+            final Integer[] ownerId = chatRoomOwnerId;
             final String[] pass = passwords;
+            final Integer[] isPriv = isRoomPriv;
             chatRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, final int position, long l) {
@@ -224,6 +229,9 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                         if (hashPass("").equals(pass[position])) {
                             new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
                             editor.putString("currentChatRoom", roomName);
+                            editor.putInt("currentChatRoomPriv",isPriv[position]);
+                            editor.putInt("currentChatOwner",ownerId[position]);
+                            editor.putString("currentChatRoomPass",pass[position]);
                             editor.apply();
                             //new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
 
@@ -231,6 +239,9 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                             startActivity(goToChatRoom);
                         } else if(pref.getString("usersFrom"+roomName,"").contains(pref.getString("username",""))){
                             editor.putString("currentChatRoom", roomName);
+                            editor.putInt("currentChatRoomPriv",isPriv[position]);
+                            editor.putInt("currentChatOwner",ownerId[position]);
+                            editor.putString("currentChatRoomPass",pass[position]);
                             editor.apply();
                             new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
                             Intent goToChatRoom = new Intent(act, ChatRooms.class);
@@ -248,7 +259,9 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                                             if (hashPass(password.getText().toString()).equals(pass[position])) {
                                                 Toast.makeText(act, "Password Correct", Toast.LENGTH_SHORT).show();
                                                 new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
-                                                editor.putString("currentChatRoom", roomName);
+                                                editor.putInt("currentChatRoomPriv",isPriv[position]);
+                                                editor.putString("currentChatRoomPass",pass[position]);
+                                                editor.putInt("currentChatOwner",ownerId[position]);
                                                 editor.apply();
                                                 new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
 
@@ -271,7 +284,9 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                         }
 
                     } else {
-                        editor.putString("currentChatRoom", roomName);
+                        editor.putInt("currentChatRoomPriv",isPriv[position]);
+                        editor.putString("currentChatRoomPass",pass[position]);
+                        editor.putInt("currentChatOwner",ownerId[position]);
                         editor.apply();
                         new SendDataAsync(getActivity(), getActivity()).execute("getAllUsersFromChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
                         Intent goToChatRoom = new Intent(act, ChatRooms.class);
