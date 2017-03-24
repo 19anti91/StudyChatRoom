@@ -116,9 +116,12 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
                 data += "&" + URLEncoder.encode("private", "UTF-8") + "=" + value2;
             }else if(action.equals("setupRoomPassword")){
+                value1=args[2];
+                value2=args[3];
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
                 data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + value2;
             }else if(action.equals("removeChatRoomPassword")){
+                value1=args[2];
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
             }
 

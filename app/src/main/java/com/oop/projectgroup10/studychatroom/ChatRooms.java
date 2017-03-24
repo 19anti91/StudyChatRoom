@@ -14,6 +14,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -521,6 +523,7 @@ public class ChatRooms extends AppCompatActivity {
                         confirmPassword.addTextChangedListener(passwordValidation);
 
 
+
                         if(isChecked){
 
                             final TextView cancel = (TextView)dialog.findViewById(R.id.cancelTxt);
@@ -537,9 +540,25 @@ public class ChatRooms extends AppCompatActivity {
                             OK.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    if(!(password.getText().toString().equals(confirmPassword.getText().toString())) && !password.getText().toString().equals("")){
-                                        new SendDataAsync(getActivity(),getActivity()).execute("setupRoomPassword",String.valueOf(pref.getInt("userid",0)),pref.getString("currentChatRoom",""),password.getText().toString());
-                                        dialog.hide();
+                                    if((password.getText().toString().equals(confirmPassword.getText().toString())) && !password.getText().toString().equals("")){
+                                        byte byteData[] = null;
+                                        try{
+
+                                            MessageDigest md = MessageDigest.getInstance("SHA-256");
+                                            md.update(password.getText().toString().getBytes());
+                                            byteData = md.digest();
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+                                        StringBuilder pass = new StringBuilder();
+                                        for (int i = 0; i < byteData.length; i++) {
+                                            pass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+                                        }
+// TODO NAME NOT GOING THROUGH
+                                        final String roomN = pref.getString("currentChatRoom","");
+                                        Log.d("room",roomN);
+                                       // new SendDataAsync(getActivity(),getActivity()).execute("setupRoomPassword",String.valueOf(pref.getInt("userid",0)),,pass.toString());
+                                        dialog.dismiss();
                                     }
                                 }
                             });
@@ -564,7 +583,7 @@ public class ChatRooms extends AppCompatActivity {
                             OK.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    if(!(password.getText().toString().equals(confirmPassword.getText().toString())) && !password.getText().toString().equals("")){
+                                    if(true){
                                         new SendDataAsync(getActivity(),getActivity()).execute("removeChatRoomPassword",String.valueOf(pref.getInt("userid",0)),pref.getString("currentChatRoom",""));
                                         dialog.hide();
                                     }
