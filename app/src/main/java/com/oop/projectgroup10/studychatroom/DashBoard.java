@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 public class DashBoard extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+//TODO ONLY teachers and admins can create rooms
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -97,6 +97,32 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
             } else if (action.equals("getAllUsersFromChatRoom")) {
                 value1 = args[2];
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+            } else if(action.equals("updateChatRoomName")){
+                value1 = args[2];
+                value2 = args[3];
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+                data += "&" + URLEncoder.encode("newRoomName", "UTF-8") + "=" + value2;
+            }else if(action.equals("makeRoomPriv")){
+                value1 = args[2];
+                value2 = args[3];
+
+                if(value2.equals("true")){
+                    value2 = "1";
+                }
+                else
+                {
+                    value2 = "0";
+                }
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+                data += "&" + URLEncoder.encode("private", "UTF-8") + "=" + value2;
+            }else if(action.equals("setupRoomPassword")){
+                value1=args[2];
+                value2=args[3];
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+                data += "&" + URLEncoder.encode("password", "UTF-8") + "=" + value2;
+            }else if(action.equals("removeChatRoomPassword")){
+                value1=args[2];
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
             }
 
 
@@ -182,8 +208,14 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
                 editor.putString("usersFrom"+value1, allUsersFromRoom.toString());
                 editor.apply();
 
-            }
+            }else if(action.equals("updateChatRoomName")){
+                JSONObject name = new JSONObject(returnValues.getString("data"));
+                editor.putString("currentChatRoom",name.getString("name"));
+                editor.apply();
 
+                Toast.makeText(act,statusMessage,Toast.LENGTH_LONG).show();
+
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

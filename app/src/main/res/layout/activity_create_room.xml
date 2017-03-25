@@ -22,7 +22,7 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/roomName"
+            android:id="@+id/roomNameMan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -36,8 +36,8 @@
             android:id="@+id/roomPassCr"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/roomName"
-            android:layout_below="@+id/roomName"
+            android:layout_alignStart="@+id/roomNameMan"
+            android:layout_below="@+id/roomNameMan"
             android:layout_marginTop="34dp"
             android:ems="10"
             android:hint="Room password"

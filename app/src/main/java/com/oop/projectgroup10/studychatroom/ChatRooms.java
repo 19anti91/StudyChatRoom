@@ -1,17 +1,26 @@
 package com.oop.projectgroup10.studychatroom;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.support.annotation.LayoutRes;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,16 +28,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.security.MessageDigest;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -332,7 +345,299 @@ public class ChatRooms extends AppCompatActivity {
 
 
             } else {
-                rootView = inflater.inflate(R.layout.activity_private_message, container, false);
+                rootView = inflater.inflate(R.layout.manage_room, container, false);
+
+
+
+                final TextView roomName = (TextView) rootView.findViewById(R.id.roomNameMan);
+                final Switch makeRoomPriv = (Switch) rootView.findViewById(R.id.makePrivMan);
+                makeRoomPriv.setChecked(!(pref.getInt("currentChatRoomPriv",3)==0));
+                final Switch passProt = (Switch) rootView.findViewById(R.id.passwordProtectedSwitch);
+                passProt.setChecked(!(ChatRoomsTwoTabs.hashPass("").equals(pref.getString("currentChatRoomPass","5"))));
+                final TextView changePass = (TextView) rootView.findViewById(R.id.changePasswordMan);
+                TextView inviteUser = (TextView) rootView.findViewById(R.id.inviteUsersMan);
+                TextView banUser = (TextView) rootView.findViewById(R.id.banUsersMan);
+                TextView deleteRoom = (TextView) rootView.findViewById(R.id.deleteRoomMan);
+                TextView leaveRoom = (TextView) rootView.findViewById(R.id.leaveRoomMan);
+
+                int userId = pref.getInt("userid",0);
+                int ownerId = pref.getInt("currentChatOwner",0);
+                String userType = pref.getString("type","");
+                Log.d("TeST",userType);
+
+                if(userId != ownerId && !userType.equals("Administrator")){
+
+                    roomName.setVisibility(View.INVISIBLE);
+                    makeRoomPriv.setVisibility(View.INVISIBLE);
+                    passProt.setVisibility(View.INVISIBLE);
+                    changePass.setVisibility(View.INVISIBLE);
+                    inviteUser.setVisibility(View.INVISIBLE);
+                    banUser.setVisibility(View.INVISIBLE);
+                    deleteRoom.setVisibility(View.INVISIBLE);
+
+                }
+
+                final String roomN = pref.getString("currentChatRoom","");
+                roomName.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final EditText name = new EditText(getActivity());
+                        name.setText(pref.getString("currentChatRoom",""));
+
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Change Room Name")
+                                .setMessage("Please choose the new name")
+                                .setView(name)
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                        if(!name.getText().toString().equals(""))
+                                        {
+                                            new SendDataAsync(getActivity(),getActivity()).execute("updateChatRoomName",String.valueOf(pref.getInt("userid",0)), roomN,name.getText().toString());
+                                            name.setText(pref.getString("currentChatRoom",""));
+                                        }else{
+                                            Toast.makeText(getActivity(),"Room name cannot be empty", Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
+                    }
+                });
+
+
+
+
+
+                makeRoomPriv.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+                        final CompoundButton.OnCheckedChangeListener list = this;
+
+
+                    if(isChecked){
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Do you want to proceed?")
+                                .setMessage("The room will only be visible to its members")
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new SendDataAsync(getActivity(),getActivity()).execute("makeRoomPriv",String.valueOf(pref.getInt("userid",0)),roomN,String.valueOf(isChecked));
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                        makeRoomPriv.setOnCheckedChangeListener(null);
+                                        makeRoomPriv.setChecked(!isChecked);
+                                        makeRoomPriv.setOnCheckedChangeListener(list);
+                                    }
+                                })
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
+                    }else{
+                        new AlertDialog.Builder(getActivity())
+                                .setTitle("Do you want to proceed?")
+                                .setMessage("The room will be visible to everyone")
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new SendDataAsync(getActivity(),getActivity()).execute("makeRoomPriv",String.valueOf(pref.getInt("userid",0)),pref.getString("currentChatRoom",""),String.valueOf(isChecked));
+
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        makeRoomPriv.setOnCheckedChangeListener(null);
+                                        makeRoomPriv.setChecked(!isChecked);
+                                        makeRoomPriv.setOnCheckedChangeListener(list);
+                                    }
+                                })
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
+                    }
+
+
+                    }
+                });
+
+                //type current password to remove password
+
+
+
+
+                passProt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+
+
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, final boolean isChecked) {
+                        final CompoundButton.OnCheckedChangeListener list = this;
+                        final Dialog dialog = new Dialog(getActivity());
+                        dialog.setContentView(R.layout.dialog_manage_room_pass);
+
+                        final EditText password = (EditText)dialog.findViewById(R.id.passwordMan);
+                        final EditText confirmPassword = (EditText)dialog.findViewById(R.id.confPassMan);
+
+                        //final boolean passwordOK = false;
+                        TextWatcher passwordValidation = new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                                if (!(password.getText().toString().equals(confirmPassword.getText().toString()))) {
+
+                                    confirmPassword.setTextColor(Color.parseColor("#FE0417"));
+                                    password.setTextColor(Color.parseColor("#FE0417"));
+
+                                } else {
+
+                                    confirmPassword.setTextColor(Color.parseColor("#28B463"));
+                                    password.setTextColor(Color.parseColor("#28B463"));
+
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+
+                            }
+                        };
+
+
+                        confirmPassword.addTextChangedListener(passwordValidation);
+
+
+
+                        if(isChecked){
+
+                            final TextView cancel = (TextView)dialog.findViewById(R.id.cancelTxt);
+                            final TextView OK = (TextView)dialog.findViewById(R.id.okTxt);
+                            cancel.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    passProt.setOnCheckedChangeListener(null);
+                                    passProt.setChecked(!isChecked);
+                                    passProt.setOnCheckedChangeListener(list);
+                                    dialog.hide();
+                                }
+                            });
+                            OK.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if((password.getText().toString().equals(confirmPassword.getText().toString())) && !password.getText().toString().equals("")){
+                                        byte byteData[] = null;
+                                        try{
+
+                                            MessageDigest md = MessageDigest.getInstance("SHA-256");
+                                            md.update(password.getText().toString().getBytes());
+                                            byteData = md.digest();
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+                                        StringBuilder pass = new StringBuilder();
+                                        for (int i = 0; i < byteData.length; i++) {
+                                            pass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+                                        }
+// TODO NAME NOT GOING THROUGH
+                                        final String roomN = pref.getString("currentChatRoom","");
+                                        Log.d("room",roomN);
+                                       // new SendDataAsync(getActivity(),getActivity()).execute("setupRoomPassword",String.valueOf(pref.getInt("userid",0)),,pass.toString());
+                                        dialog.dismiss();
+                                    }
+                                }
+                            });
+                            dialog.show();
+
+                        }else{
+                            final TextView confirm = (TextView)dialog.findViewById(R.id.confPassTxt);
+                            final EditText confirmPass = (EditText) dialog.findViewById(R.id.confPassMan);
+                            confirm.setVisibility(View.INVISIBLE);
+                            changePass.setVisibility(View.VISIBLE);
+                            final TextView cancel = (TextView)dialog.findViewById(R.id.cancelTxt);
+                            final TextView OK = (TextView)dialog.findViewById(R.id.okTxt);
+                            cancel.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    passProt.setOnCheckedChangeListener(null);
+                                    passProt.setChecked(!isChecked);
+                                    passProt.setOnCheckedChangeListener(list);
+                                    dialog.hide();
+                                }
+                            });
+                            OK.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if(true){
+                                        new SendDataAsync(getActivity(),getActivity()).execute("removeChatRoomPassword",String.valueOf(pref.getInt("userid",0)),pref.getString("currentChatRoom",""));
+                                        dialog.hide();
+                                    }
+                                }
+                            });
+                            dialog.show();
+
+                        }
+
+
+                    }
+                });
+
+                changePass.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                inviteUser.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+                banUser.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+
+                deleteRoom.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+
+                leaveRoom.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+
+
+
+
+
+                //if regular user only show leave room
+                //if admin or room owner show all except leave room
+
+
 //delete room, ban people, change room name, create, change password, remove password, invite, make private, make public
          //regular user leave room
                 //add warnings

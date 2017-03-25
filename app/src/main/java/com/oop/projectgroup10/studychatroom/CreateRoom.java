@@ -99,7 +99,7 @@ public class CreateRoom extends AppCompatActivity {
     }
 
     public String getRoomName() {
-        EditText roomName = (EditText) findViewById(R.id.roomName);
+        EditText roomName = (EditText) findViewById(R.id.roomNameMan);
         return roomName.getText().toString();
     }
 
