@@ -750,6 +750,107 @@ public class ChatRooms extends AppCompatActivity {
                     public void onClick(View v) {
 
 
+                        final EditText password = new EditText(getContext());
+                        final EditText confirmPassword = new EditText(getContext());
+                        final EditText passwordOld = new EditText(getContext());
+                        final LinearLayout layout = new LinearLayout(getContext());
+
+                        layout.setOrientation(LinearLayout.VERTICAL);
+
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        params.setMargins(50,0,0,0);
+                        password.setHint("Password            ");
+                        confirmPassword.setHint("Confirm Password    ");
+                        passwordOld.setHint("Old Password        ");
+                        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        passwordOld.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        password.setLayoutParams(params);
+                        passwordOld.setLayoutParams(params);
+                        confirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        confirmPassword.setLayoutParams(params);
+
+                        TextWatcher passwordValidation = new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                                if (!(password.getText().toString().equals(confirmPassword.getText().toString()))) {
+
+                                    confirmPassword.setTextColor(Color.parseColor("#FE0417"));
+                                    password.setTextColor(Color.parseColor("#FE0417"));
+
+                                } else {
+
+                                    confirmPassword.setTextColor(Color.parseColor("#28B463"));
+                                    password.setTextColor(Color.parseColor("#28B463"));
+
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+
+                            }
+                        };
+
+
+                        confirmPassword.addTextChangedListener(passwordValidation);
+                        layout.addView(passwordOld);
+
+                        layout.addView(password);
+                        layout.addView(confirmPassword);
+
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Please type and confirm the password")
+                                    .setView(layout)
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int k) {
+
+
+                                                byte byteData[] = null;
+                                                byte byteData2[] = null;
+                                                try {
+
+                                                    MessageDigest md = MessageDigest.getInstance("SHA-256");
+                                                    MessageDigest md1 = MessageDigest.getInstance("SHA-256");
+                                                    md.update(password.getText().toString().getBytes());
+                                                    md1.update(passwordOld.getText().toString().getBytes());
+                                                    byteData = md.digest();
+                                                    byteData2 = md1.digest();
+
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                                StringBuilder pass = new StringBuilder();
+                                                StringBuilder pass2 = new StringBuilder();
+                                                for (int i = 0; i < byteData.length; i++) {
+                                                    pass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+                                                    pass2.append(Integer.toString((byteData2[i] & 0xff) + 0x100, 16).substring(1));
+                                                }
+                                            if((password.getText().toString().equals(confirmPassword.getText().toString())) && !password.getText().toString().equals("") && pass2.toString().equals(pref.getString("currentChatRoomPass",""))){
+                                                new SendDataAsync(getActivity(), getActivity()).execute("setupRoomPassword", String.valueOf(pref.getInt("userid", 0)), pref.getString("currentChatRoom", ""), pass.toString());
+                                                edit.putString("currentChatRoomPass",pass.toString());
+                                                edit.apply();
+                                            }else{
+                                                Toast.makeText(getContext(),"Please check your password", Toast.LENGTH_LONG).show();
+                                            }
+
+                                                                                    }
+                                    })
+                                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        }
+                                    })
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .show();
+
 
 
                     }
