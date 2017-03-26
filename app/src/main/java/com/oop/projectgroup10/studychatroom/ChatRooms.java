@@ -108,6 +108,7 @@ public class ChatRooms extends AppCompatActivity {
         // primary sections of the activity.
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        Log.e("ROOOOM",pref.getString("currentChatRoom","adsasdasd"));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(pref.getString("currentChatRoom", ""));
 
@@ -456,6 +457,7 @@ public class ChatRooms extends AppCompatActivity {
 
                                     }
                                 })
+
                                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -476,7 +478,152 @@ public class ChatRooms extends AppCompatActivity {
 
 
 
+                passProt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton,final boolean isChecked) {
 
+                        final CompoundButton.OnCheckedChangeListener list = this;
+                        final EditText password = new EditText(getContext());
+                        final EditText confirmPassword = new EditText(getContext());
+
+                        final LinearLayout layout = new LinearLayout(getContext());
+
+                        layout.setOrientation(LinearLayout.VERTICAL);
+
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                        params.setMargins(50,0,0,0);
+                        password.setHint("Password            ");
+                        confirmPassword.setHint("Confirm Password    ");
+                        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        password.setLayoutParams(params);
+                        confirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                        confirmPassword.setLayoutParams(params);
+
+                        TextWatcher passwordValidation = new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                            }
+
+                            @Override
+                            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                                if (!(password.getText().toString().equals(confirmPassword.getText().toString()))) {
+
+                                    confirmPassword.setTextColor(Color.parseColor("#FE0417"));
+                                    password.setTextColor(Color.parseColor("#FE0417"));
+
+                                } else {
+
+                                    confirmPassword.setTextColor(Color.parseColor("#28B463"));
+                                    password.setTextColor(Color.parseColor("#28B463"));
+
+                                }
+                            }
+
+                            @Override
+                            public void afterTextChanged(Editable s) {
+
+                            }
+                        };
+
+
+                        confirmPassword.addTextChangedListener(passwordValidation);
+                        layout.addView(password);
+                        layout.addView(confirmPassword);
+
+                        if(isChecked){
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Please type and confirm the password")
+                                    .setView(layout)
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int k) {
+
+                                            if((password.getText().toString().equals(confirmPassword.getText().toString())) && !password.getText().toString().equals("")) {
+                                                byte byteData[] = null;
+                                                try {
+
+                                                    MessageDigest md = MessageDigest.getInstance("SHA-256");
+                                                    md.update(password.getText().toString().getBytes());
+                                                    byteData = md.digest();
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                                StringBuilder pass = new StringBuilder();
+                                                for (int i = 0; i < byteData.length; i++) {
+                                                    pass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+                                                }
+
+                                                new SendDataAsync(getActivity(), getActivity()).execute("setupRoomPassword", String.valueOf(pref.getInt("userid", 0)), pref.getString("currentChatRoom", ""), pass.toString());
+                                                edit.putString("currentChatRoomPass",pass.toString());
+                                                edit.apply();
+                                            }
+                                            }
+                                    })
+                                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            passProt.setOnCheckedChangeListener(null);
+                                            passProt.setChecked(!isChecked);
+                                            passProt.setOnCheckedChangeListener(list);
+                                        }
+                                    })
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .show();
+                        }
+                        else{
+                            layout.removeView(confirmPassword);
+                            new AlertDialog.Builder(getContext())
+                                    .setTitle("Please enter the room password")
+                                    .setView(layout)
+                                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int k) {
+
+                                                byte byteData[] = null;
+                                                try {
+
+                                                    MessageDigest md = MessageDigest.getInstance("SHA-256");
+                                                    md.update(password.getText().toString().getBytes());
+                                                    byteData = md.digest();
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                                StringBuilder pass = new StringBuilder();
+                                                for (int i = 0; i < byteData.length; i++) {
+                                                    pass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+                                                }
+
+                                                if((pass.toString().equals(pref.getString("currentChatRoomPass",""))))
+                                                {
+                                                    new SendDataAsync(getActivity(), getActivity()).execute("removeChatRoomPassword", String.valueOf(pref.getInt("userid", 0)), pref.getString("currentChatRoom", ""));
+                                                    edit.putString("currentChatRoomPass",pass.toString());
+                                                    edit.apply();
+                                                }else{
+                                                    Toast.makeText(getContext(),"Incorrect Password. Please try again", Toast.LENGTH_LONG).show();
+                                                    passProt.setOnCheckedChangeListener(null);
+                                                    passProt.setChecked(!isChecked);
+                                                    passProt.setOnCheckedChangeListener(list);
+                                                }
+
+                                        }
+                                    })
+                                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            passProt.setOnCheckedChangeListener(null);
+                                            passProt.setChecked(!isChecked);
+                                            passProt.setOnCheckedChangeListener(list);
+                                        }
+                                    })
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .show();
+                        }
+
+                    }
+                });
+/*
                 passProt.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
 
@@ -531,16 +678,18 @@ public class ChatRooms extends AppCompatActivity {
                             cancel.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
+
+
                                     passProt.setOnCheckedChangeListener(null);
                                     passProt.setChecked(!isChecked);
                                     passProt.setOnCheckedChangeListener(list);
-                                    dialog.hide();
+                                    dialog.dismiss();
                                 }
                             });
                             OK.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    if((password.getText().toString().equals(confirmPassword.getText().toString())) && !password.getText().toString().equals("")){
+                                   if((password.getText().toString().equals(confirmPassword.getText().toString())) && !password.getText().toString().equals("")){
                                         byte byteData[] = null;
                                         try{
 
@@ -554,10 +703,8 @@ public class ChatRooms extends AppCompatActivity {
                                         for (int i = 0; i < byteData.length; i++) {
                                             pass.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
                                         }
-// TODO NAME NOT GOING THROUGH
-                                        final String roomN = pref.getString("currentChatRoom","");
-                                        Log.d("room",roomN);
-                                       // new SendDataAsync(getActivity(),getActivity()).execute("setupRoomPassword",String.valueOf(pref.getInt("userid",0)),,pass.toString());
+
+                                        new SendDataAsync(getActivity(),getActivity()).execute("setupRoomPassword",String.valueOf(pref.getInt("userid",0)),pref.getString("currentChatRoom",""),pass.toString());
                                         dialog.dismiss();
                                     }
                                 }
@@ -584,8 +731,9 @@ public class ChatRooms extends AppCompatActivity {
                                 @Override
                                 public void onClick(View v) {
                                     if(true){
+
                                         new SendDataAsync(getActivity(),getActivity()).execute("removeChatRoomPassword",String.valueOf(pref.getInt("userid",0)),pref.getString("currentChatRoom",""));
-                                        dialog.hide();
+                                        dialog.dismiss();
                                     }
                                 }
                             });
@@ -595,11 +743,14 @@ public class ChatRooms extends AppCompatActivity {
 
 
                     }
-                });
+                });*/
 
                 changePass.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+
+
+
 
                     }
                 });

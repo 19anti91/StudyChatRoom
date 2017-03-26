@@ -259,6 +259,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                                             if (hashPass(password.getText().toString()).equals(pass[position])) {
                                                 Toast.makeText(act, "Password Correct", Toast.LENGTH_SHORT).show();
                                                 new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
+                                                editor.putString("currentChatRoom",roomName);
                                                 editor.putInt("currentChatRoomPriv",isPriv[position]);
                                                 editor.putString("currentChatRoomPass",pass[position]);
                                                 editor.putInt("currentChatOwner",ownerId[position]);
@@ -284,6 +285,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                         }
 
                     } else {
+                        editor.putString("currentChatRoom",roomName);
                         editor.putInt("currentChatRoomPriv",isPriv[position]);
                         editor.putString("currentChatRoomPass",pass[position]);
                         editor.putInt("currentChatOwner",ownerId[position]);
