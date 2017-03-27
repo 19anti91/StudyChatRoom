@@ -893,8 +893,8 @@ public class ChatRooms extends AppCompatActivity {
                             });
                             new AlertDialog.Builder(getContext())
                                     .setView(rootView)
-                                    .setTitle("Select user to invite")
-                                    .setMessage("You can only invite one user at a time")
+                                    .setTitle("Select user to ban")
+                                    .setMessage("You can only ban one user at a time")
                                     .setIcon(R.drawable.ic_alert)
                                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                         @Override
