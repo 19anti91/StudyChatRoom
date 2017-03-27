@@ -247,7 +247,17 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
                             Intent goToChatRoom = new Intent(act, ChatRooms.class);
                             startActivity(goToChatRoom);
                         }else{
-//TODO if admin no need to join room or prompt for password, admin can also see all rooms
+                            if(pref.getString("type","").equals("Administrator")){
+                                //new SendDataAsync(act, act).execute("joinChatRoom", String.valueOf(pref.getInt("userid", 0)), roomName);
+                                editor.putString("currentChatRoom",roomName);
+                                editor.putInt("currentChatRoomPriv",isPriv[position]);
+                                editor.putString("currentChatRoomPass",pass[position]);
+                                editor.putInt("currentChatOwner",ownerId[position]);
+                                editor.apply();
+                                Intent goToChatRoom = new Intent(act, ChatRooms.class);
+                                startActivity(goToChatRoom);
+                            }
+
                             new AlertDialog.Builder(act)
                                     .setTitle("Join Chat Room?")
                                     .setMessage("This room is password protected. Please type in password")

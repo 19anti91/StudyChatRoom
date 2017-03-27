@@ -92,7 +92,19 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
                 data += "&" + URLEncoder.encode("userId", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
                 data += "&" + URLEncoder.encode("groupName", "UTF-8") + "=" + URLEncoder.encode(receiverUsername, "UTF-8");
-            } else {
+            }else if(action.equals("inviteUser")){
+                link = "http://www.passtrunk.com/OOPAPI/fcmhandler.php";
+                data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
+                data += "&" + URLEncoder.encode("userName", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + URLEncoder.encode(receiverUsername, "UTF-8");
+                Log.e("Data", senderId+receiverUsername);
+            }else if(action.equals("banUser")){
+                link = "http://www.passtrunk.com/OOPAPI/fcmhandler.php";
+                data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
+                data += "&" + URLEncoder.encode("userName", "UTF-8") + "=" + URLEncoder.encode(senderId, "UTF-8");
+                data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + URLEncoder.encode(receiverUsername, "UTF-8");
+            }
+            else {
                 link = "http://www.passtrunk.com/OOPAPI/fcmhandler.php";
                 message = args[3];
                 data = URLEncoder.encode("action", "UTF-8") + "=" + URLEncoder.encode(action, "UTF-8");
