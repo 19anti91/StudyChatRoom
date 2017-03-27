@@ -13,10 +13,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DashBoard extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-//TODO ONLY teachers and admins can create rooms
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,11 +97,16 @@ public class DashBoard extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (id == R.id.createRoom) {
-            Intent goToCreateRoom = new Intent(this, CreateRoom.class);
-            startActivity(goToCreateRoom);
+            if(pref.getString("type","").equals("Student")){
+                Toast.makeText(this, "Create Room is only available for Teachers and Administrators", Toast.LENGTH_LONG).show();
+            }else{
+                Intent goToCreateRoom = new Intent(this, CreateRoom.class);
+                startActivity(goToCreateRoom);
+            }
+
         } else if (id == R.id.settings) {
             Intent goToSettings = new Intent(this, MemberSettings.class);
             startActivity(goToSettings);
@@ -112,7 +118,7 @@ public class DashBoard extends AppCompatActivity
 
 
         } else if (id == R.id.privateMessageRoom) {
-            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+
             new SendDataAsync(getApplicationContext(), this).execute("getAllUsers", String.valueOf(pref.getInt("userid", 0)));
             Intent goToPrivMsgRoom = new Intent(this, PrivateMessageUserList.class);
             startActivity(goToPrivMsgRoom);

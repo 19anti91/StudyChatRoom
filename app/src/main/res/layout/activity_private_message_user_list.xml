@@ -2,7 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context="com.oop.projectgroup10.studychatroom.PrivateMessageUserList">
 
     <include layout="@layout/content_private_message_user_list" />
@@ -10,6 +10,6 @@
     <ListView
         android:id="@+id/userList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
 
 </android.support.design.widget.CoordinatorLayout>
