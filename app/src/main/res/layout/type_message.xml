@@ -5,6 +5,11 @@
     android:background="@color/colorPrimaryDark"
     android:gravity="bottom"
     android:orientation="horizontal">
+    <LinearLayout
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="0px"
+        android:layout_height="0px"/>
 
     <EditText
         android:id="@+id/msgToSend"
@@ -12,6 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="Write a message"
+
         android:textColor="#CFD8DC"
         android:textColorHint="#CFD8DC" />
 

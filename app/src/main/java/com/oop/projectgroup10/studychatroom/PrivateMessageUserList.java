@@ -1,20 +1,25 @@
 package com.oop.projectgroup10.studychatroom;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,7 +39,7 @@ public class PrivateMessageUserList extends AppCompatActivity {
         actionBar.setTitle("Select User");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = pref.edit();
         editor.putString("currentPrivUser", "");
         editor.apply();
@@ -64,6 +69,76 @@ public class PrivateMessageUserList extends AppCompatActivity {
         final Integer[] icon = userIcon;
         mainListView.setAdapter(customAdapter);
 
+
+        mainListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                LinearLayout layout = new LinearLayout(act);
+                layout.setOrientation(LinearLayout.VERTICAL);
+
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.setMargins(10,10,10,10);
+                TextView block = new TextView(act);
+
+                block.setTextSize(18);
+
+                TextView privateMessage = new TextView(act);
+                privateMessage.setTextSize(18);
+
+                privateMessage.setPadding(20,40,20,40);
+                block.setPadding(20,40,20,40);
+                privateMessage.setText("Send Private Message");
+                privateMessage.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+                block.setText("Block User");
+                block.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+                layout.addView(block);
+                layout.addView(privateMessage);
+                privateMessage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        String username = mainListView.getItemAtPosition(position).toString();
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putString("currentPrivUser", username);
+                        editor.putInt("currentPrivUserIcon", icon[position]);
+
+                        editor.apply();
+
+                        Intent goToPrivMsgRoom = new Intent(act, PrivateMessage.class);
+                        startActivity(goToPrivMsgRoom);
+                    }
+                });
+                block.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new AlertDialog.Builder(act)
+                                .setTitle("Block User")
+                                .setMessage("User will not be able to send you a private message")
+                                .setIcon(R.drawable.ic_alert)
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new SendDataAsync(act,act).execute("blockUser", String.valueOf(pref.getInt("userid",0)),mainListView.getItemAtPosition(position).toString() );
+                                        Toast.makeText(act, "User has been Blocked", Toast.LENGTH_LONG).show();
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                })
+                                .show();
+                    }
+                });
+
+                new AlertDialog.Builder(act)
+                        .setView(layout)
+                        .show();
+                return true;
+            }
+        });
         mainListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -78,6 +153,7 @@ public class PrivateMessageUserList extends AppCompatActivity {
 
                 Intent goToPrivMsgRoom = new Intent(act, PrivateMessage.class);
                 startActivity(goToPrivMsgRoom);
+
             }
         });
     }

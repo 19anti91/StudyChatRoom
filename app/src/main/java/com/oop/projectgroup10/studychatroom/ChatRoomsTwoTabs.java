@@ -44,7 +44,7 @@ public class ChatRoomsTwoTabs extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-//TODO try to implement Search here and on user list
+
     /**
      * The {@link ViewPager} that will host the section contents.
      */
