@@ -124,6 +124,9 @@ public class SendDataAsync extends AsyncTask<String, Void, String> {
             }else if(action.equals("removeChatRoomPassword")||action.equals("deleteChatRoom") || action.equals("leaveChatRoom")){
                 value1=args[2];
                 data += "&" + URLEncoder.encode("roomName", "UTF-8") + "=" + value1;
+            }else if(action.equals("blockUser")){
+                value1=args[2];
+                data += "&" + URLEncoder.encode("blockee", "UTF-8") + "=" + value1;
             }
 
 
