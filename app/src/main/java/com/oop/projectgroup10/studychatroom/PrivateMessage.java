@@ -1,6 +1,7 @@
 package com.oop.projectgroup10.studychatroom;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -10,11 +11,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.Timer;
@@ -96,9 +101,78 @@ public class PrivateMessage extends AppCompatActivity {
             }
         }, 0, 500);
 
+        SimpleImageArrayAdapter adapter =new SimpleImageArrayAdapter(this,new Integer[]{
+                0x0,
+                0x1F602,
+                0x1F603,
+                0x1F606,
+                0x1F60B,
+                0x1F61D,
+                0x1F61C,
+                0x1F620,
+                0x2705,
+                0x270C,
+                0x1F601
+        });
+
+        final Spinner emojiSpinner = (Spinner)findViewById(R.id.emojiSpinner);
+
+        emojiSpinner.setAdapter(adapter);
+        emojiSpinner.setSelection(-1);
+        emojiSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Integer emojis [] = new Integer[11];
+                emojis[0] = 0x0;
+                emojis[1] = 0x1F602;
+                emojis[2] = 0x1F603;
+                emojis[3] = 0x1F606;
+                emojis[4] = 0x1F60B;
+                emojis[5] = 0x1F61D;
+                emojis[6] = 0x1F61C;
+                emojis[7] = 0x1F620;
+                emojis[8] = 0x2705;
+                emojis[9] = 0x270C;
+                emojis[10] = 0x1F601;
+                EditText msg = (EditText)findViewById(R.id.msgToSend);
+                msg.setText(msg.getText().toString()+ new String(Character.toChars(emojis[position])));
+                emojiSpinner.setSelection(0);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
     }
 
+    public class SimpleImageArrayAdapter extends ArrayAdapter<Integer> {
+        private Integer[] images;
+
+        public SimpleImageArrayAdapter(Context context, Integer[] images) {
+            super(context, android.R.layout.simple_spinner_item, images);
+            this.images = images;
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            return getImageForPosition(position);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return getImageForPosition(position);
+        }
+
+        private View getImageForPosition(int position) {
+            TextView emoji = new TextView(getBaseContext());
+            emoji.setTextSize(25);
+            emoji.setText(new String (Character.toChars(images[position])));
+            return emoji;
+        }
+
+    }
 
     public void sendMessage(View v) {
 
