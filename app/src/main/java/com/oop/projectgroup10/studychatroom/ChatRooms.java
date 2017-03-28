@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
@@ -46,6 +48,11 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -96,13 +103,7 @@ public class ChatRooms extends AppCompatActivity {
         UIHandler.post(runnable);
     }
 
-    //TODO emojis
-/*
-    public String getEmojiByUnicode(int unicode){
-        return new String(Character.toChars(unicode));
-        msgFromMe.setText(getEmojiByUnicode(0x1F60A));
-        http://apps.timwhitlock.info/emoji/tables/unicode
-    }*/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -348,10 +349,10 @@ public class ChatRooms extends AppCompatActivity {
                 send.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendMessage(v);
+                        sendMessage(v,"");
                     }
                 });
-                //TODO check why dif pictures
+
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -1018,13 +1019,13 @@ public class ChatRooms extends AppCompatActivity {
         }
 
         //end
-        public void sendMessage(View v) {
+        public void sendMessage(View v, final String path) {
 
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.msg_from_me, null);
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             String toGroup = pref.getString("currentChatRoom", "");
 
-            if (!getMessage().isEmpty()) {
+            if (!getMessage().isEmpty() && path.isEmpty()) {
                 new MessageAsync(getActivity(), getActivity(), view, layout).execute("groupMsg", String.valueOf(pref.getInt("userid", 0)), toGroup, getMessage());
                 layout.addView(view);
                 TextView msgFromMe = (TextView) rootView.findViewById(R.id.msgFromMeTxt);
@@ -1046,7 +1047,75 @@ public class ChatRooms extends AppCompatActivity {
                 );
 
             }
+            if(!path.isEmpty()){
+                String name = path.split("/")[5];
+                new MessageAsync(getActivity(), getActivity(), view, layout).execute("groupMsg", String.valueOf(pref.getInt("userid", 0)), toGroup, path);
+                layout.addView(view);
+                TextView msgFromMe = (TextView) rootView.findViewById(R.id.msgFromMeTxt);
+                msgFromMe.setId(generateViewId());
+                msgFromMe.setText(name + "has been attached" + new String(Character.toChars(0x1F4CE)));
+                msgFromMe.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new getFileFromAmazonTask().execute(path);
+                    }
+                });
+                ImageView icon = getIcon(pref.getInt("usericon", 0), R.id.messageFromMeIcon, view);
+                layout.invalidate();
+                EditText msgToSend = (EditText) rootView.findViewById(R.id.msgToSend);
+                msgToSend.setText("");
+
+                final ScrollView scroll = (ScrollView) rootView.findViewById(R.id.scrollPriv);
+                scroll.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    scroll.fullScroll(View.FOCUS_DOWN);
+                                }
+                            }
+
+                );
+            }
         }
+
+        private class getFileFromAmazonTask extends AsyncTask<String, Void,Void> {
+            @Override
+            protected Void doInBackground(String ...params){
+                String name = params[0].split("/")[5];
+                InputStream input = null;
+                OutputStream output = null;
+                HttpURLConnection connection = null;
+                try{
+                    URL urlData = new URL(params[0]);
+
+                    connection = (HttpURLConnection) urlData.openConnection();
+                    connection.connect();
+
+                    input = connection.getInputStream();
+                    output = new FileOutputStream(Environment.getExternalStorageDirectory()+"/studychatroom/"+name);
+
+                    byte data[] = new byte[4096];
+                    long total = 0;
+                    int count;
+                    while ((count = input.read(data)) != -1) {
+
+                        output.write(data, 0, count);
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }finally {
+                    try{
+                        if(input!=null){
+                            input.close();
+                        }
+                        if(output!=null){
+                            output.close();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }}
 
         public void recieveMessage(View v) {
             new MessageAsync(getActivity(), getActivity(), view, layout).execute();
