@@ -72,6 +72,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -80,7 +81,7 @@ import java.util.zip.Inflater;
 
 public class ChatRooms extends AppCompatActivity {
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
-    public static ViewGroup view;
+    public static ViewGroup view = null;
     public static LinearLayout layout;
     public static Handler UIHandler;
     static boolean isActive = false;
@@ -237,14 +238,14 @@ public class ChatRooms extends AppCompatActivity {
         }
 
 
-        public static void populateReceivedMsg(String msg, String from, Activity activity, int ico) {
+        public void populateReceivedMsg(String message, String from, Activity activity, int ico) {
 
 
             View view = LayoutInflater.from(activity).inflate(R.layout.msg_from_them, null);
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(activity);
             String toGroup = pref.getString("userGroup", "");
 
-            if (!msg.isEmpty() && from.equals(toGroup)) {
+            if (!message.isEmpty() && from.equals(toGroup)) {
 
                 layout.addView(view);
                 TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
@@ -254,7 +255,26 @@ public class ChatRooms extends AppCompatActivity {
                 ImageView icon = getIcon(ico, R.id.msgFromThemIcon, view);
 
                 msgFromMe.setId(generateViewId());
-                msgFromMe.setText(msg);
+                if(message.contains("https")){
+                    message =  URLDecoder.decode(message);
+                    Log.e("Received", message);
+                }
+                final String msg =message;
+
+                msgFromMe.setId(generateViewId());
+
+                if(msg.split("/")[0].equals("https:") && msg.split("/")[2].equals("s3.amazonaws.com")){
+                    msgFromMe.setText(msg.split("/")[5] + " has been attached" + new String(Character.toChars(0x1F4CE)));
+                    msgFromMe.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new getFileFromAmazonTask().execute(msg);
+                        }
+                    });
+                }else{
+                    msgFromMe.setText(msg);
+                }
+
                 layout.invalidate();
 /*
                 final ScrollView scroll = (ScrollView) lay.findViewById(R.id.scrollPriv);
