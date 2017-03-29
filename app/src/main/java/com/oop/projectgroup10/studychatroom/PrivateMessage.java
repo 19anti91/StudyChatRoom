@@ -60,13 +60,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PrivateMessage extends AppCompatActivity {
 
-    static final int PERMISSION_CAMERA = 100;
+
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static Context context;
@@ -433,7 +434,7 @@ public class PrivateMessage extends AppCompatActivity {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String toUsername = pref.getString("currentPrivUser", "");
 
-        if (!getMessage().isEmpty() && path.isEmpty()) {
+        if (!getMessage().isEmpty() && path.equals("")) {
             new MessageAsync(getApplicationContext(), this, view, layout).execute("privMsg", String.valueOf(pref.getInt("userid", 0)), toUsername, getMessage());
             layout.addView(view);
             TextView msgFromMe = (TextView) findViewById(R.id.msgFromMeTxt);
@@ -455,13 +456,13 @@ public class PrivateMessage extends AppCompatActivity {
             );
 
         }
-        if(!path.isEmpty()){
+        if(!path.equals("")){
             String name = path.split("/")[5];
             new MessageAsync(getApplicationContext(), this, view, layout).execute("privMsg", String.valueOf(pref.getInt("userid", 0)), toUsername, path);
             layout.addView(view);
             TextView msgFromMe = (TextView) findViewById(R.id.msgFromMeTxt);
             msgFromMe.setId(generateViewId());
-            msgFromMe.setText(name + "has been attached" + new String(Character.toChars(0x1F4CE)));
+            msgFromMe.setText(name + " has been attached" + new String(Character.toChars(0x1F4CE)));
             msgFromMe.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -542,14 +543,16 @@ public class PrivateMessage extends AppCompatActivity {
             //int privUserIcon = pref.getInt("currentPrivUserIcon",7);
             ImageView icon = getIcon(pref.getInt("currentPrivUserIcon", 7), R.id.msgFromThemIcon);
 
+            final String message = URLDecoder.decode(msg);
+            Log.e("AAAAA", message);
             msgFromMe.setId(generateViewId());
 
-            if(msg.split("/")[0].equals("https") && msg.split("/")[2].equals("s3.amazonaws.com")){
-                msgFromMe.setText(msg.split("/")[5] + "has been attached" + new String(Character.toChars(0x1F4CE)));
+            if(message.split("/")[0].equals("https:") && message.split("/")[2].equals("s3.amazonaws.com")){
+                msgFromMe.setText(message.split("/")[5] + " has been attached" + new String(Character.toChars(0x1F4CE)));
                 msgFromMe.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        new getFileFromAmazonTask().execute(msg);
+                        new getFileFromAmazonTask().execute(message);
                     }
                 });
             }else{

@@ -1,20 +1,30 @@
 package com.oop.projectgroup10.studychatroom;
 
+import android.*;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -45,9 +55,18 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -65,6 +84,29 @@ public class ChatRooms extends AppCompatActivity {
     public static LinearLayout layout;
     public static Handler UIHandler;
     static boolean isActive = false;
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static Context context;
+    private static String[] PERMISSIONS_STORAGE = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 
     static {
         UIHandler = new Handler(Looper.getMainLooper());
@@ -99,6 +141,10 @@ public class ChatRooms extends AppCompatActivity {
         }
     }
 
+
+
+
+    private static final int READ_REQUEST_CODE = 42;
     public static void runOnUI(Runnable runnable) {
         UIHandler.post(runnable);
     }
@@ -110,7 +156,7 @@ public class ChatRooms extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_rooms);
 
-
+        verifyStoragePermissions(this);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
 
@@ -225,6 +271,130 @@ public class ChatRooms extends AppCompatActivity {
 
         }
 
+        public static String getPath(final Context context, final Uri uri) {
+
+            final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+            // DocumentProvider
+            if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+                // ExternalStorageProvider
+                if (isExternalStorageDocument(uri)) {
+                    final String docId = DocumentsContract.getDocumentId(uri);
+                    final String[] split = docId.split(":");
+                    final String type = split[0];
+
+                    if ("primary".equalsIgnoreCase(type)) {
+                        return Environment.getExternalStorageDirectory() + "/" + split[1];
+                    }
+
+
+                }
+                // DownloadsProvider
+                else if (isDownloadsDocument(uri)) {
+
+                    final String id = DocumentsContract.getDocumentId(uri);
+                    final Uri contentUri = ContentUris.withAppendedId(
+                            Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                    return getDataColumn(context, contentUri, null, null);
+                }
+                // MediaProvider
+                else if (isMediaDocument(uri)) {
+                    final String docId = DocumentsContract.getDocumentId(uri);
+                    final String[] split = docId.split(":");
+                    final String type = split[0];
+
+                    Uri contentUri = null;
+                    if ("image".equals(type)) {
+                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                    } else if ("video".equals(type)) {
+                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                    } else if ("audio".equals(type)) {
+                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                    }
+
+                    final String selection = "_id=?";
+                    final String[] selectionArgs = new String[] {
+                            split[1]
+                    };
+
+                    return getDataColumn(context, contentUri, selection, selectionArgs);
+                }
+            }
+            // MediaStore (and general)
+            else if ("content".equalsIgnoreCase(uri.getScheme())) {
+                return getDataColumn(context, uri, null, null);
+            }
+            // File
+            else if ("file".equalsIgnoreCase(uri.getScheme())) {
+                return uri.getPath();
+            }
+
+            return null;
+        }
+
+        public static String getDataColumn(Context context, Uri uri, String selection,
+                                           String[] selectionArgs) {
+
+            Cursor cursor = null;
+            final String column = "_data";
+            final String[] projection = {
+                    column
+            };
+
+            try {
+                cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                        null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    final int column_index = cursor.getColumnIndexOrThrow(column);
+                    return cursor.getString(column_index);
+                }
+            } finally {
+                if (cursor != null)
+                    cursor.close();
+            }
+            return null;
+        }
+
+
+        public static boolean isExternalStorageDocument(Uri uri) {
+            return "com.android.externalstorage.documents".equals(uri.getAuthority());
+        }
+
+
+        public static boolean isDownloadsDocument(Uri uri) {
+            return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+        }
+
+        public static boolean isMediaDocument(Uri uri) {
+            return "com.android.providers.media.documents".equals(uri.getAuthority());
+        }
+        void uploadToS3(File file, String filename){
+
+            // Initialize the Amazon Cognito credentials provider
+            CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                    getContext(),
+                    "us-east-1:6bad921a-feca-4b70-b3d0-0d217a6b1d2c", // Identity Pool ID
+                    Regions.US_EAST_1 // Region
+            );
+
+
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+            AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+            TransferUtility transferUtility = new TransferUtility(s3, getContext());
+            s3.setRegion(Region.getRegion(Regions.US_EAST_1));
+
+            TransferObserver observer = transferUtility.upload(
+                    "studychatroom","documents/"+filename,file
+
+            );
+            String path = "https://s3.amazonaws.com/studychatroom/documents/"+filename;
+
+            sendMessage(view, path);
+
+
+        }
         public static ImageView getIcon(int icon, int id, View view) {
             ImageView imageView = (ImageView) view.findViewById(id);
             switch (icon) {
@@ -279,9 +449,53 @@ public class ChatRooms extends AppCompatActivity {
         }
         ListView listView;
         CustomListAdapter adapter;
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode,
+                                     Intent resultData) {
+
+            if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+
+                Uri uri = null;
+                String displayName = "";
+                if (resultData != null) {
+                    uri = resultData.getData();
+                    Cursor cursor = getActivity().getContentResolver()
+                            .query(uri, null, null, null, null, null);
+
+                    try {
+
+                        if (cursor != null && cursor.moveToFirst()) {
+
+                            displayName = cursor.getString(
+                                    cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+
+                        }
+                    } finally {
+                        cursor.close();
+                    }
+                    File fileToUpload = new File(getPath(getActivity(),uri));
+
+                    uploadToS3(fileToUpload,displayName);
+                    Log.i("?????????", "Uri: " + uri.toString());
+
+                }
+            }
+        }
+        public void performFileSearch() {
+
+
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+
+            startActivityForResult(intent, READ_REQUEST_CODE);
+        }
         @Override
         public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                                  Bundle savedInstanceState) {
+
 
             final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             final SharedPreferences.Editor edit = pref.edit();
@@ -339,7 +553,7 @@ public class ChatRooms extends AppCompatActivity {
 
             } else if (section == 1) {
                 rootView = inflater.inflate(R.layout.activity_private_message, container, false);
-
+                verifyStoragePermissions(getActivity());
                 layout = (LinearLayout) rootView.findViewById(R.id.privMsgLayout);
                 view = (ViewGroup) rootView.findViewById(R.id.privMsgLayout);
 
@@ -417,6 +631,15 @@ public class ChatRooms extends AppCompatActivity {
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
 
+                    }
+                });
+
+                ImageView attach = (ImageView)rootView.findViewById(R.id.attach);
+
+                attach.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        performFileSearch();
                     }
                 });
 

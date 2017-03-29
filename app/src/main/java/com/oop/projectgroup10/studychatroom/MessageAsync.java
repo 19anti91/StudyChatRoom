@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -192,7 +193,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
         }
     }
 
-    public void populateMsgFromMe(final String msg) {
+    public void populateMsgFromMe( String message) {
 
         View view = LayoutInflater.from(act).inflate(R.layout.msg_from_me, null);
         // LinearLayout layout = (LinearLayout) view.findViewById(R.id.privMsgLayout);
@@ -203,8 +204,20 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
         layout.addView(view);
         TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromMeTxt);
         msgFromMe.setId(generateViewId());
-        if(msg.split("/")[0].equals("https") && msg.split("/")[2].equals("s3.amazonaws.com")){
-            msgFromMe.setText(msg.split("/")[5] + "has been attached" + new String(Character.toChars(0x1F4CE)));
+
+
+        if(message.contains("https")){
+            message =  URLDecoder.decode(message);
+            Log.e("Received", message);
+        }
+        final String msg =message;
+
+
+        msgFromMe.setId(generateViewId());
+
+
+        if(msg.split("/")[0].equals("https:") && msg.split("/")[2].equals("s3.amazonaws.com")){
+            msgFromMe.setText(msg.split("/")[5] + " has been attached" + new String(Character.toChars(0x1F4CE)));
             msgFromMe.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -212,7 +225,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
                 }
             });
         }else{
-            msgFromMe.setText(msg);
+            msgFromMe.setText(message);
         }
         ImageView icon = getIcon(pref.getInt("usericon", 7), R.id.messageFromMeIcon);
 
@@ -261,11 +274,10 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
             return null;
         }
     }
-    public void populateReceivedMsg(final String msg, String fromUser, int ico) {
-
+    public void populateReceivedMsg(String message, String fromUser, int ico) {
 
         View view = LayoutInflater.from(act).inflate(R.layout.msg_from_them, null);
-        // LinearLayout layout = (LinearLayout) view.findViewById(R.id.privMsgLayout);
+
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(act);
         String toUsername = pref.getString("currentPrivUser", "");
         int privUserIcon = pref.getInt("currentPrivUserIcon", 7);
@@ -284,8 +296,14 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
             userName.setText(fromUser);
         }
         msgFromMe.setId(generateViewId());
-        if(msg.split("/")[0].equals("https") && msg.split("/")[2].equals("s3.amazonaws.com")){
-            msgFromMe.setText(msg.split("/")[5] + "has been attached" + new String(Character.toChars(0x1F4CE)));
+
+        if(message.contains("https")){
+            message =  URLDecoder.decode(message);
+        }
+        final String msg = message;
+
+        if(message.split("/")[0].equals("https:") && message.split("/")[2].equals("s3.amazonaws.com")){
+            msgFromMe.setText(message.split("/")[5] + " has been attached" + new String(Character.toChars(0x1F4CE)));
             msgFromMe.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -293,7 +311,7 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
                 }
             });
         }else{
-            msgFromMe.setText(msg);
+            msgFromMe.setText(message);
         }
         layout.invalidate();
 
