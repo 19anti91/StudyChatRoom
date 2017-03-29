@@ -184,6 +184,8 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
                 if (from.equals(String.valueOf(pref.getInt("userid", 0)))) {
                     populateMsgFromMe(msg);
                 } else {
+                    fromUser = message.getString("fromusername");
+                    icon = Integer.valueOf(message.getString("fromusericon"));
                     populateReceivedMsg(msg, fromUser, icon);
                 }
             }

@@ -597,6 +597,7 @@ public class ChatRooms extends AppCompatActivity {
 
                                 if (pref.getInt("hasMessage", 0) == 1) {
                                     Log.d("MESSAGE", pref.getString("message", ""));
+                                    if(!pref.getString("userFrom","").equals(pref.getString("username","")))
                                     populateReceivedMsg(pref.getString("message", ""), pref.getString("userGroup", ""), getActivity(), Integer.valueOf(pref.getString("groupUserIcon", "")));
 
                                     edit.putInt("hasMessage", 0);
