@@ -87,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
         if (!isValid) {
             Toast.makeText(this, "Invalid email address. Please check again.", Toast.LENGTH_LONG).show();
         } else
-        if (getFname().isEmpty() || getLname().isEmpty() || getUsername().isEmpty() || getEmail().isEmpty() || getUserType().isEmpty() || !passwordOK) {
+        if (getFname().isEmpty() || getLname().isEmpty() || getUsername().isEmpty() || getEmail().isEmpty() || getUserType().isEmpty() || !passwordOK || !getPassword().equals(getPasswordConfirm())) {
             Toast.makeText(this, "Please note that all the fields are required. Passwords must match", Toast.LENGTH_LONG).show();
         } else {
             new SubmitLoginAndSignup(v.getContext(), this).execute("register", getUsername(), getPassword(), getFname(), getLname(), getEmail(), getUserType(), getAvatar());
