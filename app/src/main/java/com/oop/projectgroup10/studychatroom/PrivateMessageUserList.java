@@ -34,7 +34,7 @@ public class PrivateMessageUserList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_message_user_list);
-//TODO block someone using onlongclicklistener
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("Select User");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

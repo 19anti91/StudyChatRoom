@@ -100,13 +100,13 @@ public class DashBoard extends AppCompatActivity
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (id == R.id.createRoom) {
+
             if(pref.getString("type","").equals("Student")){
                 Toast.makeText(this, "Create Room is only available for Teachers and Administrators", Toast.LENGTH_LONG).show();
             }else{
                 Intent goToCreateRoom = new Intent(this, CreateRoom.class);
                 startActivity(goToCreateRoom);
             }
-
         } else if (id == R.id.settings) {
             Intent goToSettings = new Intent(this, MemberSettings.class);
             startActivity(goToSettings);

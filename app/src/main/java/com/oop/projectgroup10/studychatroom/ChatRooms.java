@@ -1,18 +1,30 @@
 package com.oop.projectgroup10.studychatroom;
 
+import android.*;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -43,9 +55,24 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -54,10 +81,33 @@ import java.util.zip.Inflater;
 
 public class ChatRooms extends AppCompatActivity {
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
-    public static ViewGroup view;
+    public static ViewGroup view = null;
     public static LinearLayout layout;
     public static Handler UIHandler;
     static boolean isActive = false;
+
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static Context context;
+    private static String[] PERMISSIONS_STORAGE = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 
     static {
         UIHandler = new Handler(Looper.getMainLooper());
@@ -92,24 +142,22 @@ public class ChatRooms extends AppCompatActivity {
         }
     }
 
+
+
+
+    private static final int READ_REQUEST_CODE = 42;
     public static void runOnUI(Runnable runnable) {
         UIHandler.post(runnable);
     }
 
-    //TODO emojis
-/*
-    public String getEmojiByUnicode(int unicode){
-        return new String(Character.toChars(unicode));
-        msgFromMe.setText(getEmojiByUnicode(0x1F60A));
-        http://apps.timwhitlock.info/emoji/tables/unicode
-    }*/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_rooms);
 
-
+        verifyStoragePermissions(this);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
 
@@ -190,14 +238,14 @@ public class ChatRooms extends AppCompatActivity {
         }
 
 
-        public static void populateReceivedMsg(String msg, String from, Activity activity, int ico) {
+        public void populateReceivedMsg(String message, String from, Activity activity, int ico) {
 
 
             View view = LayoutInflater.from(activity).inflate(R.layout.msg_from_them, null);
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(activity);
             String toGroup = pref.getString("userGroup", "");
 
-            if (!msg.isEmpty() && from.equals(toGroup)) {
+            if (!message.isEmpty() && from.equals(toGroup)) {
 
                 layout.addView(view);
                 TextView msgFromMe = (TextView) view.findViewById(R.id.msgFromThemTxt);
@@ -207,7 +255,26 @@ public class ChatRooms extends AppCompatActivity {
                 ImageView icon = getIcon(ico, R.id.msgFromThemIcon, view);
 
                 msgFromMe.setId(generateViewId());
-                msgFromMe.setText(msg);
+                if(message.contains("https")){
+                    message =  URLDecoder.decode(message);
+                    Log.e("Received", message);
+                }
+                final String msg =message;
+
+                msgFromMe.setId(generateViewId());
+
+                if(msg.split("/")[0].equals("https:") && msg.split("/")[2].equals("s3.amazonaws.com")){
+                    msgFromMe.setText(msg.split("/")[5] + " has been attached" + new String(Character.toChars(0x1F4CE)));
+                    msgFromMe.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            new getFileFromAmazonTask().execute(msg);
+                        }
+                    });
+                }else{
+                    msgFromMe.setText(msg);
+                }
+
                 layout.invalidate();
 /*
                 final ScrollView scroll = (ScrollView) lay.findViewById(R.id.scrollPriv);
@@ -224,6 +291,130 @@ public class ChatRooms extends AppCompatActivity {
 
         }
 
+        public static String getPath(final Context context, final Uri uri) {
+
+            final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+            // DocumentProvider
+            if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+                // ExternalStorageProvider
+                if (isExternalStorageDocument(uri)) {
+                    final String docId = DocumentsContract.getDocumentId(uri);
+                    final String[] split = docId.split(":");
+                    final String type = split[0];
+
+                    if ("primary".equalsIgnoreCase(type)) {
+                        return Environment.getExternalStorageDirectory() + "/" + split[1];
+                    }
+
+
+                }
+                // DownloadsProvider
+                else if (isDownloadsDocument(uri)) {
+
+                    final String id = DocumentsContract.getDocumentId(uri);
+                    final Uri contentUri = ContentUris.withAppendedId(
+                            Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                    return getDataColumn(context, contentUri, null, null);
+                }
+                // MediaProvider
+                else if (isMediaDocument(uri)) {
+                    final String docId = DocumentsContract.getDocumentId(uri);
+                    final String[] split = docId.split(":");
+                    final String type = split[0];
+
+                    Uri contentUri = null;
+                    if ("image".equals(type)) {
+                        contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                    } else if ("video".equals(type)) {
+                        contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                    } else if ("audio".equals(type)) {
+                        contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                    }
+
+                    final String selection = "_id=?";
+                    final String[] selectionArgs = new String[] {
+                            split[1]
+                    };
+
+                    return getDataColumn(context, contentUri, selection, selectionArgs);
+                }
+            }
+            // MediaStore (and general)
+            else if ("content".equalsIgnoreCase(uri.getScheme())) {
+                return getDataColumn(context, uri, null, null);
+            }
+            // File
+            else if ("file".equalsIgnoreCase(uri.getScheme())) {
+                return uri.getPath();
+            }
+
+            return null;
+        }
+
+        public static String getDataColumn(Context context, Uri uri, String selection,
+                                           String[] selectionArgs) {
+
+            Cursor cursor = null;
+            final String column = "_data";
+            final String[] projection = {
+                    column
+            };
+
+            try {
+                cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                        null);
+                if (cursor != null && cursor.moveToFirst()) {
+                    final int column_index = cursor.getColumnIndexOrThrow(column);
+                    return cursor.getString(column_index);
+                }
+            } finally {
+                if (cursor != null)
+                    cursor.close();
+            }
+            return null;
+        }
+
+
+        public static boolean isExternalStorageDocument(Uri uri) {
+            return "com.android.externalstorage.documents".equals(uri.getAuthority());
+        }
+
+
+        public static boolean isDownloadsDocument(Uri uri) {
+            return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+        }
+
+        public static boolean isMediaDocument(Uri uri) {
+            return "com.android.providers.media.documents".equals(uri.getAuthority());
+        }
+        void uploadToS3(File file, String filename){
+
+            // Initialize the Amazon Cognito credentials provider
+            CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                    getContext(),
+                    "us-east-1:6bad921a-feca-4b70-b3d0-0d217a6b1d2c", // Identity Pool ID
+                    Regions.US_EAST_1 // Region
+            );
+
+
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+            AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+            TransferUtility transferUtility = new TransferUtility(s3, getContext());
+            s3.setRegion(Region.getRegion(Regions.US_EAST_1));
+
+            TransferObserver observer = transferUtility.upload(
+                    "studychatroom","documents/"+filename,file
+
+            );
+            String path = "https://s3.amazonaws.com/studychatroom/documents/"+filename;
+
+            sendMessage(view, path);
+
+
+        }
         public static ImageView getIcon(int icon, int id, View view) {
             ImageView imageView = (ImageView) view.findViewById(id);
             switch (icon) {
@@ -278,9 +469,53 @@ public class ChatRooms extends AppCompatActivity {
         }
         ListView listView;
         CustomListAdapter adapter;
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode,
+                                     Intent resultData) {
+
+            if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+
+                Uri uri = null;
+                String displayName = "";
+                if (resultData != null) {
+                    uri = resultData.getData();
+                    Cursor cursor = getActivity().getContentResolver()
+                            .query(uri, null, null, null, null, null);
+
+                    try {
+
+                        if (cursor != null && cursor.moveToFirst()) {
+
+                            displayName = cursor.getString(
+                                    cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+
+                        }
+                    } finally {
+                        cursor.close();
+                    }
+                    File fileToUpload = new File(getPath(getActivity(),uri));
+
+                    uploadToS3(fileToUpload,displayName);
+                    Log.i("?????????", "Uri: " + uri.toString());
+
+                }
+            }
+        }
+        public void performFileSearch() {
+
+
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+
+            startActivityForResult(intent, READ_REQUEST_CODE);
+        }
         @Override
         public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                                  Bundle savedInstanceState) {
+
 
             final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             final SharedPreferences.Editor edit = pref.edit();
@@ -338,7 +573,7 @@ public class ChatRooms extends AppCompatActivity {
 
             } else if (section == 1) {
                 rootView = inflater.inflate(R.layout.activity_private_message, container, false);
-
+                verifyStoragePermissions(getActivity());
                 layout = (LinearLayout) rootView.findViewById(R.id.privMsgLayout);
                 view = (ViewGroup) rootView.findViewById(R.id.privMsgLayout);
 
@@ -348,10 +583,10 @@ public class ChatRooms extends AppCompatActivity {
                 send.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendMessage(v);
+                        sendMessage(v,"");
                     }
                 });
-                //TODO check why dif pictures
+
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -362,6 +597,7 @@ public class ChatRooms extends AppCompatActivity {
 
                                 if (pref.getInt("hasMessage", 0) == 1) {
                                     Log.d("MESSAGE", pref.getString("message", ""));
+                                    if(!pref.getString("userFrom","").equals(pref.getString("username","")))
                                     populateReceivedMsg(pref.getString("message", ""), pref.getString("userGroup", ""), getActivity(), Integer.valueOf(pref.getString("groupUserIcon", "")));
 
                                     edit.putInt("hasMessage", 0);
@@ -416,6 +652,15 @@ public class ChatRooms extends AppCompatActivity {
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
 
+                    }
+                });
+
+                ImageView attach = (ImageView)rootView.findViewById(R.id.attach);
+
+                attach.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        performFileSearch();
                     }
                 });
 
@@ -1018,13 +1263,13 @@ public class ChatRooms extends AppCompatActivity {
         }
 
         //end
-        public void sendMessage(View v) {
+        public void sendMessage(View v, final String path) {
 
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.msg_from_me, null);
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             String toGroup = pref.getString("currentChatRoom", "");
 
-            if (!getMessage().isEmpty()) {
+            if (!getMessage().isEmpty() && path.isEmpty()) {
                 new MessageAsync(getActivity(), getActivity(), view, layout).execute("groupMsg", String.valueOf(pref.getInt("userid", 0)), toGroup, getMessage());
                 layout.addView(view);
                 TextView msgFromMe = (TextView) rootView.findViewById(R.id.msgFromMeTxt);
@@ -1046,7 +1291,75 @@ public class ChatRooms extends AppCompatActivity {
                 );
 
             }
+            if(!path.isEmpty()){
+                String name = path.split("/")[5];
+                new MessageAsync(getActivity(), getActivity(), view, layout).execute("groupMsg", String.valueOf(pref.getInt("userid", 0)), toGroup, path);
+                layout.addView(view);
+                TextView msgFromMe = (TextView) rootView.findViewById(R.id.msgFromMeTxt);
+                msgFromMe.setId(generateViewId());
+                msgFromMe.setText(name + "has been attached" + new String(Character.toChars(0x1F4CE)));
+                msgFromMe.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new getFileFromAmazonTask().execute(path);
+                    }
+                });
+                ImageView icon = getIcon(pref.getInt("usericon", 0), R.id.messageFromMeIcon, view);
+                layout.invalidate();
+                EditText msgToSend = (EditText) rootView.findViewById(R.id.msgToSend);
+                msgToSend.setText("");
+
+                final ScrollView scroll = (ScrollView) rootView.findViewById(R.id.scrollPriv);
+                scroll.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    scroll.fullScroll(View.FOCUS_DOWN);
+                                }
+                            }
+
+                );
+            }
         }
+
+        private class getFileFromAmazonTask extends AsyncTask<String, Void,Void> {
+            @Override
+            protected Void doInBackground(String ...params){
+                String name = params[0].split("/")[5];
+                InputStream input = null;
+                OutputStream output = null;
+                HttpURLConnection connection = null;
+                try{
+                    URL urlData = new URL(params[0]);
+
+                    connection = (HttpURLConnection) urlData.openConnection();
+                    connection.connect();
+
+                    input = connection.getInputStream();
+                    output = new FileOutputStream(Environment.getExternalStorageDirectory()+"/studychatroom/"+name);
+
+                    byte data[] = new byte[4096];
+                    long total = 0;
+                    int count;
+                    while ((count = input.read(data)) != -1) {
+
+                        output.write(data, 0, count);
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }finally {
+                    try{
+                        if(input!=null){
+                            input.close();
+                        }
+                        if(output!=null){
+                            output.close();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }}
 
         public void recieveMessage(View v) {
             new MessageAsync(getActivity(), getActivity(), view, layout).execute();
