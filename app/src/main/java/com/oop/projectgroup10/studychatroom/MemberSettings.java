@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
+//this class lets user change his settings and some preferences
 public class MemberSettings extends PreferenceActivity {
 
 

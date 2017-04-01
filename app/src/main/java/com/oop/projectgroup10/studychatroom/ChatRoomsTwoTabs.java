@@ -33,6 +33,7 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 
+//this class lists all the chat rooms, and lets user join them
 public class ChatRoomsTwoTabs extends AppCompatActivity {
 
     /**

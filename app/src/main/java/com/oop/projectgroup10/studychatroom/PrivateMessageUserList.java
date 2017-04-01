@@ -24,6 +24,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+//this class shows the user list, users can be blocked using this screen
 public class PrivateMessageUserList extends AppCompatActivity {
 
     public CustomListAdapter customAdapter;

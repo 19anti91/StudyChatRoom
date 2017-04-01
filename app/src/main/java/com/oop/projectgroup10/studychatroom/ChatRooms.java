@@ -79,6 +79,8 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.Inflater;
 
+//This class has everything related to chat rooms, from its members, to its messages and settings
+
 public class ChatRooms extends AppCompatActivity {
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);
     public static ViewGroup view = null;
@@ -115,7 +117,7 @@ public class ChatRooms extends AppCompatActivity {
 
     public ListView usersFound;
     public Activity act = this;
-    private ReceiveMessageService mBoundService;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -130,6 +132,7 @@ public class ChatRooms extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    //This generates random id for items in the view
     public static int generateViewId() {
         for (; ; ) {
             final int result = sNextGeneratedId.get();
@@ -238,6 +241,7 @@ public class ChatRooms extends AppCompatActivity {
         }
 
 
+
         public void populateReceivedMsg(String message, String from, Activity activity, int ico) {
 
 
@@ -276,21 +280,13 @@ public class ChatRooms extends AppCompatActivity {
                 }
 
                 layout.invalidate();
-/*
-                final ScrollView scroll = (ScrollView) lay.findViewById(R.id.scrollPriv);
-                scroll.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    scroll.fullScroll(View.FOCUS_DOWN);
-                                }
-                            }
 
-                );*/
 
             }
 
         }
 
+        //this will get the path of the image based on the version of the OSw
         public static String getPath(final Context context, final Uri uri) {
 
             final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
@@ -389,6 +385,7 @@ public class ChatRooms extends AppCompatActivity {
         public static boolean isMediaDocument(Uri uri) {
             return "com.android.providers.media.documents".equals(uri.getAuthority());
         }
+
         void uploadToS3(File file, String filename){
 
             // Initialize the Amazon Cognito credentials provider
@@ -398,7 +395,7 @@ public class ChatRooms extends AppCompatActivity {
                     Regions.US_EAST_1 // Region
             );
 
-
+//Amazon handler to upload and download files
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
             AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
@@ -415,6 +412,7 @@ public class ChatRooms extends AppCompatActivity {
 
 
         }
+        //this will set the image icon
         public static ImageView getIcon(int icon, int id, View view) {
             ImageView imageView = (ImageView) view.findViewById(id);
             switch (icon) {
@@ -470,6 +468,7 @@ public class ChatRooms extends AppCompatActivity {
         ListView listView;
         CustomListAdapter adapter;
 
+        //this will get the file selected from the file picker
         @Override
         public void onActivityResult(int requestCode, int resultCode,
                                      Intent resultData) {
@@ -497,7 +496,7 @@ public class ChatRooms extends AppCompatActivity {
                     File fileToUpload = new File(getPath(getActivity(),uri));
 
                     uploadToS3(fileToUpload,displayName);
-                    Log.i("?????????", "Uri: " + uri.toString());
+
 
                 }
             }
@@ -520,9 +519,7 @@ public class ChatRooms extends AppCompatActivity {
             final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
             final SharedPreferences.Editor edit = pref.edit();
 
-            // = inflater.inflate(R.layout.fragment_chat_rooms, container, false);
-            //TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
             int section = getArguments().getInt(ARG_SECTION_NUMBER);
 
             //Members
@@ -553,22 +550,6 @@ public class ChatRooms extends AppCompatActivity {
                 adapter = new CustomListAdapter(getActivity(), userlist, userIcon);
                 final Integer[] icon = userIcon;
                 listView.setAdapter(adapter);
-                /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                        String username = listView.getItemAtPosition(position).toString();
-                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putString("currentPrivUser", username);
-                        editor.putInt("currentPrivUserIcon", icon[position]);
-
-                        editor.apply();
-
-                        Intent goToPrivMsgRoom = new Intent(getActivity(), PrivateMessage.class);
-                        startActivity(goToPrivMsgRoom);
-                    }
-                });*/
 
 
             } else if (section == 1) {
@@ -702,8 +683,6 @@ public class ChatRooms extends AppCompatActivity {
                 }else{
                     rootView = inflater.inflate(R.layout.manage_room, container, false);
 
-
-
                     final TextView roomName = (TextView) rootView.findViewById(R.id.roomNameMan);
                     final Switch makeRoomPriv = (Switch) rootView.findViewById(R.id.makePrivMan);
                     makeRoomPriv.setChecked(!(pref.getInt("currentChatRoomPriv",3)==0));
@@ -751,10 +730,6 @@ public class ChatRooms extends AppCompatActivity {
                                     .show();
                         }
                     });
-
-
-
-
 
                     makeRoomPriv.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 

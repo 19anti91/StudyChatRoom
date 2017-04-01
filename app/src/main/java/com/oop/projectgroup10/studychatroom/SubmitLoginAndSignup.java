@@ -24,10 +24,7 @@ import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 
-/**
- * Created by no717490 on 3/1/2017.
- */
-
+//this class handles the log in and signup(registration) communication with the server
 public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
 
     String rememberMe;
