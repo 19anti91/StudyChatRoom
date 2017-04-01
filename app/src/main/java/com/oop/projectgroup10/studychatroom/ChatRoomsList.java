@@ -20,6 +20,7 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
 public class ChatRoomsList extends AppCompatActivity {
 
     public CustomListAdapterChatRooms customListAdapter;

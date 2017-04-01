@@ -16,6 +16,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import static com.google.android.gms.internal.zzt.TAG;
 
+//This is the notification service for firebase
 public class NotificationService extends FirebaseMessagingService {
     public NotificationService() {
     }

@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+//This class allows users to register to our application
 public class RegisterActivity extends AppCompatActivity {
 
 

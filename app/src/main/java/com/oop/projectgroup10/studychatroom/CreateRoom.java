@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+//this class lets user create rooms
 public class CreateRoom extends AppCompatActivity {
 
     boolean passwordOK = false;

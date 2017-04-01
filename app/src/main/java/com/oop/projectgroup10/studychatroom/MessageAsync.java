@@ -28,10 +28,8 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by Anti1991 on 3/11/2017.
- */
 
+//This handles communication with the server for message related tasks
 public class MessageAsync extends AsyncTask<String, Void, String> {
 
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);

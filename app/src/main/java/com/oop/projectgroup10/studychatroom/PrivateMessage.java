@@ -65,6 +65,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
+//this class shows the private message activity and handles all related to it
 public class PrivateMessage extends AppCompatActivity {
 
 
@@ -97,7 +98,7 @@ public class PrivateMessage extends AppCompatActivity {
 
     Activity act = this;
     LinearLayout layout;
-    private ReceiveMessageService mBoundService;
+
 
     public static int generateViewId() {
         for (; ; ) {

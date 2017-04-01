@@ -15,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+//This is the log in activity
 public class LoginActivity extends AppCompatActivity {
 
     Boolean loginOK = false;
@@ -45,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-//TODO Reset Password using notification with intent to a new activity to input password
+
     }
 
     public void onBackPressed() {

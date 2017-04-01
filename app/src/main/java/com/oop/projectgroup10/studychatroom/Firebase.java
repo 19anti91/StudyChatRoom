@@ -8,9 +8,8 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 import static com.google.android.gms.internal.zzt.TAG;
 
-/**
- * Created by no717490 on 3/7/2017.
- */
+
+//this is the google service that allows notifications
 
 public class Firebase extends FirebaseInstanceIdService {
 

@@ -20,10 +20,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 
-/**
- * Created by no717490 on 3/7/2017.
- */
-
+//This class handles general purpose communications to our app
 public class SendDataAsync extends AsyncTask<String, Void, String> {
     String action;
     private Context context;
