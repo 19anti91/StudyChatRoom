@@ -178,14 +178,27 @@ public class MessageAsync extends AsyncTask<String, Void, String> {
                 if (action.equals("getGroupMsg")) {
                     fromUser = message.getString("fromusername");
                     icon = Integer.valueOf(message.getString("fromusericon"));
+
+                    if (from.equals(String.valueOf(pref.getInt("userid", 0)))) {
+                        populateMsgFromMe(msg);
+                    } else {
+                        fromUser = message.getString("fromusername");
+                        icon = Integer.valueOf(message.getString("fromusericon"));
+                        populateReceivedMsg(msg, fromUser, icon);
+                    }
+
+                }else{
+
+                    if (from.equals(String.valueOf(pref.getInt("userid", 0)))) {
+                        populateMsgFromMe(msg);
+                    } else {
+                       populateReceivedMsg(msg, fromUser, pref.getInt("currentPrivUserIcon", 7));
+                    }
                 }
-                if (from.equals(String.valueOf(pref.getInt("userid", 0)))) {
-                    populateMsgFromMe(msg);
-                } else {
-                    fromUser = message.getString("fromusername");
-                    icon = Integer.valueOf(message.getString("fromusericon"));
-                    populateReceivedMsg(msg, fromUser, icon);
-                }
+
+
+
+
             }
 
         } catch (Exception e) {

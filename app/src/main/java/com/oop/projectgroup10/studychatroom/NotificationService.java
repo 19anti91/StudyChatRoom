@@ -39,7 +39,7 @@ public class NotificationService extends FirebaseMessagingService {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = pref.edit();
-            if (!fromUser.equals(pref.getString("currentPrivUser", "0")) && fromGroup.equals("")) {
+            if (!fromUser.equals(pref.getString("currentPrivUser", "0")) /*&& fromGroup.equals("")*/) {
                 sendNotification("New message from " + fromUser, message);
             } else if (!fromGroup.equals(pref.getString("currentChatRoom", ""))) {
                 sendNotification("New message on " + fromGroup + " Chat Room", message);

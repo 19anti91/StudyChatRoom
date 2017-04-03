@@ -216,7 +216,7 @@ public class SubmitLoginAndSignup extends AsyncTask<String, Void, String> {
                     Intent goToDash = new Intent(context, DashBoard.class);
                     context.startActivity(goToDash);
                 } else if (status == 1 || status == 2) {
-                    Toast.makeText(act, statusMessage, Toast.LENGTH_LONG).show();
+                    Toast.makeText(act, "Something is wrong. Please try again", Toast.LENGTH_LONG).show();
                 }
                 //Inform the user the login as been successful and store data on the pref settings
             } else if (action.equals("register")) {
